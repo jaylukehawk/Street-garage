@@ -36,6 +36,7 @@ function ScanPage() {
   const [storedPhoto, setStoredPhoto] = useState<string | null>(null);
   const [workMsg, setWorkMsg] = useState("Reading the car");
   const [make, setMake] = useState(DEFAULT_MAKE);
+  const [aiLocked, setAiLocked] = useState(false);
   const [model, setModel] = useState(modelsFor(DEFAULT_MAKE)[0] ?? "Fiesta");
   const [colour, setColour] = useState<(typeof COLOURS)[number]>("Silver");
   const [year, setYear] = useState("");
@@ -92,7 +93,7 @@ function ScanPage() {
       const identified = await identifyVehicle({ data: { image: payload } });
       let result: IdentifyResult | null = null;
       if (identified.ok) result = identified.result;
-      else setNote(identified.error + " Pick make and model below.");
+      else setNote(identified.error + " Retake the photo.");
 
       let finalPhoto = prepared.stored;
       if (result?.plateBoxes.length) {
@@ -130,6 +131,7 @@ function ScanPage() {
       } else {
         setNote(null);
       }
+      setAiLocked(Boolean(identified.ok && result?.isVehicle && result.make));
       setStage("edit");
       setWantFavourite(false);
     } catch {
@@ -345,6 +347,7 @@ function ScanPage() {
 
           <label className="mt-5 block text-xs uppercase tracking-wider text-muted">Make</label>
           <select
+            disabled
             className="mt-1 h-12 w-full rounded-md border border-border bg-navy px-3 text-fg"
             value={MAKE_NAMES.includes(make) ? make : "__other"}
             onChange={(e) => {
@@ -363,6 +366,7 @@ function ScanPage() {
 
           <label className="mt-4 block text-xs uppercase tracking-wider text-muted">Model</label>
           <select
+            disabled
             className="mt-1 h-12 w-full rounded-md border border-border bg-navy px-3 text-fg"
             value={model}
             onChange={(e) => setModel(e.target.value)}
