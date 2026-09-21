@@ -79,7 +79,7 @@ Rules:
         },
         signal: AbortSignal.timeout(28_000),
         body: JSON.stringify({
-          model: "grok-4.5",
+          model: "grok-4.1-fast",
           temperature: 0.1,
           max_tokens: 280,
           response_format: { type: "json_object" },
@@ -87,7 +87,7 @@ Rules:
             {
               role: "user",
               content: [
-                { type: "image_url", image_url: { url: data.image, detail: "low" } },
+                { type: "image_url", image_url: { url: data.image, detail: "high" } },
                 { type: "text", text: prompt },
               ],
             },
