@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Street Garage",
+      "hasCanvas": false,
+      "bodyTextLen": 359,
+      "bodyTextHash": "86189eb5cfa89efbf4a396058f19a9ace9fa79c8de4b7843ce00942dbb7ca94f",
+      "bodyTextPrefix": "STREET GARAGE Scan the street 18 / 30 Lance Corporal III 5 / 20 ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Street Garage",
+      "hasCanvas": false,
+      "bodyTextLen": 359,
+      "bodyTextHash": "86189eb5cfa89efbf4a396058f19a9ace9fa79c8de4b7843ce00942dbb7ca94f",
+      "bodyTextPrefix": "STREET GARAGE Scan the street 18 / 30 Lance Corporal III 5 / 20 ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json"
+}

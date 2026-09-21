@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/trophies",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Street Garage",
+      "hasCanvas": false,
+      "bodyTextLen": 324,
+      "bodyTextHash": "1283010f141c3f220ea87bb0a1bbe58f3c5367a4b65f3068b2b13ea8bf68eea4",
+      "bodyTextPrefix": "METAL Trophies 1 medal unlocked · Bronze at 10 STREET GARAGE FOR",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/trophies-smoke.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Street Garage",
+      "hasCanvas": false,
+      "bodyTextLen": 324,
+      "bodyTextHash": "1283010f141c3f220ea87bb0a1bbe58f3c5367a4b65f3068b2b13ea8bf68eea4",
+      "bodyTextPrefix": "METAL Trophies 1 medal unlocked · Bronze at 10 STREET GARAGE FOR",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/trophies-smoke-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/trophies-smoke.json"
+}
