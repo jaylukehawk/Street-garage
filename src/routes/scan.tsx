@@ -345,38 +345,9 @@ function ScanPage() {
             </div>
           ) : null}
 
-          <label className="mt-5 block text-xs uppercase tracking-wider text-muted">Make</label>
-          <select
-            disabled
-            className="mt-1 h-12 w-full rounded-md border border-border bg-navy px-3 text-fg"
-            value={MAKE_NAMES.includes(make) ? make : "__other"}
-            onChange={(e) => {
-              const next = e.target.value === "__other" ? make : e.target.value;
-              setMake(next);
-              setModel(modelsFor(next)[0] ?? "");
-            }}
-          >
-            {MAKE_NAMES.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-            {!MAKE_NAMES.includes(make) ? <option value="__other">{make}</option> : null}
-          </select>
-
-          <label className="mt-4 block text-xs uppercase tracking-wider text-muted">Model</label>
-          <select
-            disabled
-            className="mt-1 h-12 w-full rounded-md border border-border bg-navy px-3 text-fg"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-          >
-            {modelOptions.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
+       <p className="mt-5 text-sm text-muted">
+            Make and model are set from the photo and cannot be changed.
+          </p>
 
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div>
