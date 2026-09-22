@@ -77,7 +77,8 @@ export const useGarageStore = create<GarageState>()(
         set({ scanDay: today, scansUsedToday: 0 });
       },
       completeOnboarding: () => set({ onboarded: true }),
-      remainingScans: () => Math.max(0, scanCap(get().sightings) - get().scansUsedToday),
+            remainingScans: () =>
+        Math.max(0, scanCap(get().sightings, get().garagePlus) - get().scansUsedToday),
       addSighting: (input) => {
         const state = get();
         state.ensureDay();
