@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bookmark, Camera, History, LayoutGrid, Trophy } from "lucide-react";
+import { Bookmark, Camera, History, LayoutGrid, Users } from "lucide-react";
 import { useGarageStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +8,7 @@ const TABS = [
   { to: "/collection", label: "Collection", icon: LayoutGrid, match: (p: string) => p === "/collection" || p.startsWith("/collection/") },
   { to: "/history", label: "History", icon: History, match: (p: string) => p === "/history" || p.startsWith("/history/") },
   { to: "/favourites", label: "Favourites", icon: Bookmark, match: (p: string) => p === "/favourites" || p.startsWith("/favourites/") },
-  { to: "/trophies", label: "Trophies", icon: Trophy, match: (p: string) => p === "/trophies" || p.startsWith("/trophies/") },
+  { to: "/friends", label: "Friends", icon: Users, match: (p: string) => p === "/friends" || p.startsWith("/friends/") },
 ] as const;
 
 export function TabBar() {
