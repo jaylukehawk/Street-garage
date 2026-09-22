@@ -296,14 +296,7 @@ function ScanPage() {
               >
                 <span className="block size-full rounded-full bg-fg" />
               </button>
-              <button
-                type="button"
-                className="min-h-14 min-w-14 rounded-md border border-border bg-navy-2 px-2 text-center text-xs text-silver"
-                onClick={useSample}
-              >
-                Sample
-              </button>
-            </div>
+                         </div>
           )}
           <p className="mt-3 text-center text-xs text-muted">
             Plates are blurred. Owners are never looked up.
