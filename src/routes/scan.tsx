@@ -153,9 +153,6 @@ function ScanPage() {
     void runIdentify(file);
   }
 
-  async function useSample() {
-    void runIdentify("/cars/vw-golf.jpg");
-  }
 
   async function save() {
     if (!storedPhoto || busy) return;
