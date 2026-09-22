@@ -192,5 +192,5 @@ export async function prepareScanPhoto(source: Blob | string, extra: PlateBox[] 
   const working = await resizeToJpeg(source, 1280, 0.84);
   const blurred = await blurPlates(working, extra);
   const stored = await resizeToJpeg(blurred, 720, 0.72);
-  return { identify: blurred, stored };
+  return { identify: working, stored };
 }
