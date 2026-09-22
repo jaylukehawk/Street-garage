@@ -19,7 +19,8 @@ function ScanHub() {
   const [refillOpen, setRefillOpen] = useState(false);
   const [left, setLeft] = useState(msUntilMidnight());
   const locked = remaining <= 0;
-  const cap = scanCap(sightings);
+  const garagePlus = useGarageStore((s) => s.garagePlus);
+  const cap = scanCap(sightings, garagePlus);
   const ratio = remaining / cap;
   const circ = 2 * Math.PI * 54;
   const dash = circ * ratio;
