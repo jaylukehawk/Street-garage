@@ -36,6 +36,6 @@ export type PlateBox = {
   h: number;
 };
 
-export const DAILY_SCAN_LIMIT = 30;
+export const DAILY_SCAN_LIMIT = 12;
 export const REFILL_PRICE = "£1.49";
 export const SAVE_VERSION = 1;
