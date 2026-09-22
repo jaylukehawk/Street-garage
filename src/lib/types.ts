@@ -37,5 +37,8 @@ export type PlateBox = {
 };
 
 export const DAILY_SCAN_LIMIT = 12;
+export const GARAGE_PLUS_EXTRA = 30;
+export const GARAGE_PLUS_PRICE = "£2 / week";
+export const GARAGE_PLUS_CODE = "HAWKZPLUS";
 export const REFILL_PRICE = "£1.49";
 export const SAVE_VERSION = 1;

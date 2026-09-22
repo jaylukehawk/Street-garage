@@ -11,7 +11,8 @@ export const Route = createFileRoute("/settings")({ component: SettingsPage });
 function SettingsPage() {
   const scansUsedToday = useGarageStore((s) => s.scansUsedToday);
   const sightings = useGarageStore((s) => s.sightings);
-  const cap = scanCap(sightings);
+  const garagePlus = useGarageStore((s) => s.garagePlus);
+  const cap = scanCap(sightings, garagePlus);
   const remaining = Math.max(0, cap - scansUsedToday);
   const purchases = useGarageStore((s) => s.demoPurchases);
   const lastRefill = purchases[0] ?? null;

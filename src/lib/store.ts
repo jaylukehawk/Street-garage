@@ -38,6 +38,8 @@ type GarageState = {
   refillScans: () => void;
   setGpsPreference: (value: GpsPreference) => void;
   clearPromotion: () => void;
+  garagePlus: boolean;
+  setGaragePlus: (on: boolean) => void;
 };
 
 export const useGarageStore = create<GarageState>()(
@@ -49,7 +51,8 @@ export const useGarageStore = create<GarageState>()(
       onboarded: false,
       sightings: [],
       scanDay: localDayKey(),
-      scansUsedToday: 0,
+      scansUsedToday: 0,       garagePlus: false,
+      setGaragePlus: (on) => set({ garagePlus: on }),
       demoPurchases: [],
       gpsPreference: "unknown",
       pendingPromotion: null,

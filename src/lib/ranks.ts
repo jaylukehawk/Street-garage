@@ -199,8 +199,9 @@ export function dailyScanLimit(progress: RankProgress) {
   return DAILY_SCAN_LIMIT + extra + progress.prestige * PRESTIGE_EXTRA_SCANS;
 }
 
-export function scanCap(sightings: Sighting[]) {
-  return dailyScanLimit(rankProgress(xpFromSightings(sightings)));
+export function scanCap(sightings: Sighting[], garagePlus = false) {
+  const extra = garagePlus ? 30 : 0;
+  return dailyScanLimit(rankProgress(xpFromSightings(sightings))) + extra;
 }
 
 export function perkUnlockNote(rank: Rank) {

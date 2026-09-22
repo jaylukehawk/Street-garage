@@ -25,7 +25,8 @@ function ScanPage() {
   const streamRef = useRef<MediaStream | null>(null);
   const scansUsedToday = useGarageStore((s) => s.scansUsedToday);
   const sightings = useGarageStore((s) => s.sightings);
-  const cap = scanCap(sightings);
+  const garagePlus = useGarageStore((s) => s.garagePlus);
+  const cap = scanCap(sightings, garagePlus);
   const remaining = Math.max(0, cap - scansUsedToday);
   const addSighting = useGarageStore((s) => s.addSighting);
   const setGps = useGarageStore((s) => s.setGpsPreference);
