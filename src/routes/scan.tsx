@@ -153,9 +153,7 @@ function ScanPage() {
     void runIdentify(file);
   }
 
-  async function useSample() {
-    void runIdentify("/cars/vw-golf.jpg");
-  }
+
 
   async function save() {
     if (!storedPhoto || busy) return;
@@ -238,14 +236,7 @@ function ScanPage() {
                     <ImageUp className="size-5" />
                     Upload photo
                   </Button>
-                  <button
-                    type="button"
-                    className="min-h-12 text-sm text-muted"
-                    onClick={useSample}
-                  >
-                    Or try a sample
-                  </button>
-                </>
+                                 </>
               ) : (
                 <Button size="lg" variant="metal" className="mt-2 w-full max-w-sm" onClick={() => setRefillOpen(true)}>
                   Refill {cap} scans — {REFILL_PRICE}
