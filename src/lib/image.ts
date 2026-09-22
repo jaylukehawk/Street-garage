@@ -53,12 +53,8 @@ function isWhitePlate(r: number, g: number, b: number) {
 
 type PixelBox = { x: number; y: number; w: number; h: number };
 
-const FALLBACK_ZONES: PlateBox[] = [
-  { x: 0.22, y: 0.62, w: 0.56, h: 0.18 },
-  { x: 0.04, y: 0.56, w: 0.42, h: 0.2 },
-  { x: 0.54, y: 0.56, w: 0.42, h: 0.2 },
-  { x: 0.24, y: 0.44, w: 0.52, h: 0.16 },
-];
+const FALLBACK_ZONES: PlateBox[] = [];
+  
 
 function detectPlateBoxes(ctx: CanvasRenderingContext2D, width: number, height: number): PixelBox[] {
   const sampleW = 160;
@@ -177,10 +173,10 @@ export async function blurPlates(dataUrl: string, extra: PlateBox[] = []) {
   ctx.drawImage(img, 0, 0);
   const detected = detectPlateBoxes(ctx, img.width, img.height);
   const extras = [...FALLBACK_ZONES, ...extra].map((box) => ({
-    x: box.x * img.width,
-    y: box.y * img.height,
-    w: box.w * img.width,
-    h: box.h * img.height,
+    x: (box.x - 0.05) * img.width,
+    y: (box.y - 0.05) * img.height,
+    w: (box.w + 0.1) * img.width,
+    h: (box.h + 0.1) * img.height,
   }));
   for (const box of [...detected, ...extras]) {
     obliterateRegion(ctx, box);

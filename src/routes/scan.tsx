@@ -86,22 +86,17 @@ function ScanPage() {
     setStage("working");
     setWorkMsg("Blurring plates");
     try {
-      const prepared = await prepareScanPhoto(source);
-      setPreview(prepared.identify);
-      setWorkMsg("Identifying make and model");
-      const payload = await resizeToJpeg(prepared.identify, 768, 0.7);
+            setWorkMsg("Identifying make and model");
+      const payload = await resizeToJpeg(source, 768, 0.7);
       const identified = await identifyVehicle({ data: { image: payload } });
       let result: IdentifyResult | null = null;
       if (identified.ok) result = identified.result;
       else setNote(identified.error + " Retake the photo.");
 
-      let finalPhoto = prepared.stored;
-      if (result?.plateBoxes.length) {
-        const again = await prepareScanPhoto(prepared.identify, result.plateBoxes);
-        finalPhoto = again.stored;
-        setPreview(again.identify);
-      }
-      setStoredPhoto(finalPhoto);
+      setWorkMsg("Blurring plates");
+      const prepared = await prepareScanPhoto(source, result?.plateBoxes ?? []);
+      setPreview(prepared.stored);
+      setStoredPhoto(prepared.stored);
 
       if (result && !result.isVehicle) {
         setNote("No vehicle found. Try another photo — this did not spend a scan.");
