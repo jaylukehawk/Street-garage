@@ -73,6 +73,16 @@ function SettingsPage() {
           </p>
         )}
       </section>
+        <section className="mt-4 rounded-xl border border-border bg-navy-2 p-4">
+        <h2 className="font-display text-xl tracking-wide">Garage+</h2>
+        <p className="mt-2 text-sm text-silver">
+          £2 / week · +30 scans a day. Real payments will use Google Play later.
+        </p>
+        <p className="mt-2 font-display text-lg tracking-wide">
+          {useGarageStore.getState().garagePlus ? "Active" : "Not active"}
+        </p>
+        <GaragePlusUnlock />
+      </section>
 
       <section className="mt-4 rounded-xl border border-border bg-navy-2 p-4">
         <h2 className="font-display text-xl tracking-wide">Privacy</h2>
@@ -85,5 +95,40 @@ function SettingsPage() {
 
       <RefillSheet open={refillOpen} onOpenChange={setRefillOpen} />
     </main>
+  );
+}
+function GaragePlusUnlock() {
+  const garagePlus = useGarageStore((s) => s.garagePlus);
+  const setGaragePlus = useGarageStore((s) => s.setGaragePlus);
+  const [code, setCode] = useState("");
+  if (garagePlus) {
+    return (
+      <button
+        type="button"
+        className="mt-3 min-h-12 w-full rounded-md border border-border text-silver"
+        onClick={() => setGaragePlus(false)}
+      >
+        Turn off tester plan
+      </button>
+    );
+  }
+  return (
+    <>
+      <input
+        className="mt-3 h-12 w-full rounded-md border border-border bg-navy px-3 text-fg"
+        placeholder="Tester code"
+        value={code}
+        onChange={(e) => setCode(e.target.value.toUpperCase())}
+      />
+      <button
+        type="button"
+        className="mt-3 min-h-12 w-full rounded-md bg-primary font-display text-lg tracking-wide text-primary-fg"
+        onClick={() => {
+          if (code === "HAWKZPLUS") setGaragePlus(true);
+        }}
+      >
+        Unlock tester plan
+      </button>
+    </>
   );
 }
