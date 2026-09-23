@@ -14,13 +14,13 @@ function ScanHub() {
   const navigate = useNavigate();
   const sightings = useGarageStore((s) => s.sightings);
   const scansUsedToday = useGarageStore((s) => s.scansUsedToday);
-  const remaining = Math.max(0, scanCap(sightings) - scansUsedToday);
+  const garagePlus = useGarageStore((s) => s.garagePlus);
+  const remaining = Math.max(0, scanCap(sightings, garagePlus) - scansUsedToday);
+  const cap = scanCap(sightings, garagePlus);
   const purchases = useGarageStore((s) => s.demoPurchases);
   const [refillOpen, setRefillOpen] = useState(false);
   const [left, setLeft] = useState(msUntilMidnight());
   const locked = remaining <= 0;
-  const garagePlus = useGarageStore((s) => s.garagePlus);
-  const cap = scanCap(sightings, garagePlus);
   const ratio = remaining / cap;
   const circ = 2 * Math.PI * 54;
   const dash = circ * ratio;
