@@ -106,7 +106,6 @@ function PartIcon({ slot }: { slot: GaragePart["slot"] }) {
                         {p.rank}
                       </p>
                     </div>
-                    </div>
                     <p className="mt-2 font-display text-lg leading-tight">
                       {p.make}
                     </p>
