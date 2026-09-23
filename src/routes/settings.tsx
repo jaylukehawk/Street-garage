@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { RefillSheet } from "@/components/refill-sheet";
 import { activePerkLines, rankProgress, scanCap, xpFromSightings } from "@/lib/ranks";
@@ -83,7 +83,15 @@ function SettingsPage() {
         </p>
         <GaragePlusUnlock />
       </section>
-
+      <section className="mt-4 rounded-xl border border-border bg-navy-2 p-4">
+        <h2 className="font-display text-xl tracking-wide">Trophies</h2>
+        <Link
+          to="/trophies"
+          className="mt-3 flex min-h-12 items-center justify-center rounded-md bg-primary font-display text-lg tracking-wide text-primary-fg"
+        >
+          Open trophy cabinet
+        </Link>
+      </section>
       <section className="mt-4 rounded-xl border border-border bg-navy-2 p-4">
         <h2 className="font-display text-xl tracking-wide">Privacy</h2>
         <p className="mt-2 text-sm leading-relaxed text-silver">

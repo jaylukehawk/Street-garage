@@ -4,6 +4,7 @@ import { MakePlate } from "@/components/medal";
 import { RankLockedSheet } from "@/components/rank-locked-sheet";
 import { RankPlate } from "@/components/rank-plate";
 import { tierForCount } from "@/lib/badges";
+import { specialCounts } from "@/lib/specials";
 import {
   RANKS,
   activePerkLines,
@@ -31,7 +32,7 @@ function TrophiesPage() {
       .sort((a, b) => b.count - a.count || a.make.localeCompare(b.make));
   }, [sightings]);
   const unlocked = rows.filter((row) => tierForCount(row.count)).length;
-
+  const classes = useMemo(() => specialCounts(sightings), [sightings]);
   return (
     <main className="px-5 pt-6 pb-4">
       <p className="font-display text-xs tracking-[0.32em] text-silver">SERVICE</p>
@@ -127,7 +128,26 @@ function TrophiesPage() {
           </div>
         </div>
       </section>
-
+      <section className="mt-8">
+        <h2 className="font-display text-xl tracking-wide">Class badges</h2>
+        <p className="mt-1 text-sm text-muted">
+          Same metal as makes. Bronze 10 · Silver 100 · Gold 500 · Platinum 2,500 · Diamond 10,000.
+        </p>
+        <div className="cabinet mt-4">
+          <div className="cabinet-inner">
+            <div className="cabinet-header">
+              <p>SPECIALS</p>
+            </div>
+            <div className="plate-rack">
+              {classes.map((row) => (
+                <div key={row.id} className="plate-slot">
+                  <MakePlate make={row.label} count={row.count} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       <RankLockedSheet
         rank={lockedRank}
         xp={xp}
