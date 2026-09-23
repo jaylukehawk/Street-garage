@@ -5,6 +5,7 @@ import { RankLockedSheet } from "@/components/rank-locked-sheet";
 import { RankPlate } from "@/components/rank-plate";
 import { tierForCount } from "@/lib/badges";
 import { specialCounts } from "@/lib/specials";
+import { ClassPlate } from "@/components/class-plate";
 import {
   RANKS,
   activePerkLines,
@@ -141,7 +142,7 @@ function TrophiesPage() {
             <div className="plate-rack">
               {classes.map((row) => (
                 <div key={row.id} className="plate-slot">
-                  <MakePlate make={row.label} count={row.count} />
+                <ClassPlate id={row.id} label={row.label} count={row.count} />
                 </div>
               ))}
             </div>
