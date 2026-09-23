@@ -92,17 +92,7 @@ function PartIcon({ slot }: { slot: GaragePart["slot"] }) {
                   >
                                         <div className="flex items-start justify-between">
                       <PartIcon slot={p.slot} />
-                                            <p
-                        className="select-none font-display text-4xl leading-none tracking-[0.18em]"
-                        style={{
-                          transform: "rotate(-9deg)",
-                          opacity: 0.88,
-                          WebkitTextStroke: "0.6px currentColor",
-                          textShadow:
-                            "0 0 5px currentColor, 1px 2px 0 currentColor, -2px 1px 4px currentColor",
-                          filter: "contrast(1.25)",
-                        }}
-                      >
+                      <p className="font-display text-7xl leading-none tracking-wide">
                         {p.rank}
                       </p>
                     </div>
