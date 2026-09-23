@@ -60,16 +60,14 @@ function rankTone(rank: GaragePart["rank"]) {
 }
 
 function PartIcon({ slot }: { slot: GaragePart["slot"] }) {
-  const common = "h-10 w-10 text-current";
-  if (slot === "body") {
-    return (
-      <svg viewBox="0 0 48 48" className={common} fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M8 28h6l5-10h16l5 10h6v8H8z" />
-        <circle cx="16" cy="36" r="3" />
-        <circle cx="34" cy="36" r="3" />
-      </svg>
-    );
-  }
+  return (
+    <img
+      src={`/parts/${slot}.jpg`}
+      alt=""
+      className="size-14 rounded-full object-cover"
+    />
+  );
+}
   if (slot === "engine") {
     return (
       <svg viewBox="0 0 48 48" className={common} fill="none" stroke="currentColor" strokeWidth="2">
