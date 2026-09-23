@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { SAVE_VERSION, type DemoPurchase, type GpsPreference, type Sighting } from "./types";
+import { rollPart, type GaragePart } from "./parts";
 import { buildSeedSightings, countUsedToday } from "./seed";
 import { isDuplicateSighting } from "./geo";
 import { duplicateWindowMs, rankIndex, rankProgress, scanCap, xpFromSightings, type RankProgress } from "./ranks";
@@ -39,6 +40,7 @@ type GarageState = {
   setGpsPreference: (value: GpsPreference) => void;
   clearPromotion: () => void;
   garagePlus: boolean;
+  parts: GaragePart[];
   setGaragePlus: (on: boolean) => void;
 };
 
@@ -51,7 +53,7 @@ export const useGarageStore = create<GarageState>()(
       onboarded: false,
       sightings: [],
       scanDay: localDayKey(),
-      scansUsedToday: 0,       garagePlus: false,
+      scansUsedToday: 0,       garagePlus: false,      parts: [],
       setGaragePlus: (on) => set({ garagePlus: on }),
       demoPurchases: [],
       gpsPreference: "unknown",
@@ -112,6 +114,7 @@ export const useGarageStore = create<GarageState>()(
           afterRank.pips > beforeRank.pips || afterRank.rank.id !== beforeRank.rank.id;
         set({
           sightings: nextSightings,
+          parts: [...(state.parts ?? []), rollPart(sighting.make, sighting.model, sighting.id)],
           scansUsedToday: state.scansUsedToday + 1,
           pendingPromotion: promotedTo,
           pendingPipFill: pipFilled || promotedTo ? { from: beforeRank, to: afterRank } : null,
@@ -157,14 +160,14 @@ export const useGarageStore = create<GarageState>()(
         scansUsedToday: state.scansUsedToday,
         demoPurchases: state.demoPurchases,
         gpsPreference: state.gpsPreference,
-        favouriteIds: state.favouriteIds ?? [],
+        favouriteIds: state.favouriteIds ?? [], parts: state.parts ?? [],
       }),
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<GarageState>;
         return {
           ...current,
           ...saved,
-          favouriteIds: Array.isArray(saved.favouriteIds) ? saved.favouriteIds : [],
+          favouriteIds: Array.isArray(saved.favouriteIds) ? saved.favouriteIds : [],         parts: Array.isArray(saved.parts) ? saved.parts : [],
         };
       },
     },
