@@ -68,50 +68,7 @@ function PartIcon({ slot }: { slot: GaragePart["slot"] }) {
     />
   );
 }
-  if (slot === "engine") {
-    return (
-      <svg viewBox="0 0 48 48" className={common} fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="12" y="16" width="22" height="16" rx="2" />
-        <path d="M34 22h6v8h-6M18 16V10h8v6M16 32v6M28 32v6" />
-      </svg>
-    );
-  }
-  if (slot === "wheels") {
-    return (
-      <svg viewBox="0 0 48 48" className={common} fill="none" stroke="currentColor" strokeWidth="2">
-        <circle cx="16" cy="24" r="8" />
-        <circle cx="16" cy="24" r="3" />
-        <circle cx="34" cy="24" r="8" />
-        <circle cx="34" cy="24" r="3" />
-      </svg>
-    );
-  }
-  if (slot === "brakes") {
-    return (
-      <svg viewBox="0 0 48 48" className={common} fill="none" stroke="currentColor" strokeWidth="2">
-        <circle cx="24" cy="24" r="10" />
-        <circle cx="24" cy="24" r="4" />
-        <path d="M24 14v4M24 30v4M14 24h4M30 24h4" />
-      </svg>
-    );
-  }
-  if (slot === "chassis") {
-    return (
-      <svg viewBox="0 0 48 48" className={common} fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M8 24h32M12 24v8M36 24v8M18 24V16h12v8" />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 48 48" className={common} fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M16 36c0-8 16-8 16 0" />
-      <path d="M16 20c0-8 16-8 16 0" />
-      <path d="M16 20v16M32 20v16" />
-    </svg>
-  );
-}
-
-function PartsList({ parts }: { parts: GaragePart[] }) {
+  function PartsList({ parts }: { parts: GaragePart[] }) {
   if (parts.length === 0) {
     return <p className="mt-8 text-sm text-muted">Scan a car to drop the first part.</p>;
   }
