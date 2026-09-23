@@ -50,12 +50,21 @@ function GaragePage() {
   );
 }
 
+function rankTone(rank: GaragePart["rank"]) {
+  if (rank === "S") return "border-[#f0d48a] text-[#f0d48a]";
+  if (rank === "A") return "border-[#e8a87c] text-[#e8a87c]";
+  if (rank === "B") return "border-[#b9a0ff] text-[#b9a0ff]";
+  if (rank === "C") return "border-[#8cb4ff] text-[#8cb4ff]";
+  if (rank === "D") return "border-[#8fd4a8] text-[#8fd4a8]";
+  return "border-border text-silver";
+}
+
 function PartsList({ parts }: { parts: GaragePart[] }) {
   if (parts.length === 0) {
     return <p className="mt-8 text-sm text-muted">Scan a car to drop the first part.</p>;
   }
   return (
-    <div className="mt-6 space-y-5">
+    <div className="mt-6 space-y-6">
       {PART_SLOTS.map((slot) => {
         const rows = parts.filter((p) => p.slot === slot);
         return (
@@ -63,23 +72,27 @@ function PartsList({ parts }: { parts: GaragePart[] }) {
             <h2 className="font-display text-xl">
               {SLOT_LABEL[slot]} · {rows.length}
             </h2>
-            <ul className="mt-2 space-y-2">
-              {rows.length === 0 ? (
-                <li className="text-sm text-muted">None yet</li>
-              ) : (
-                rows.map((p) => (
-                  <li
+            {rows.length === 0 ? (
+              <p className="mt-2 text-sm text-muted">None yet</p>
+            ) : (
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                {rows.map((p) => (
+                  <article
                     key={p.id}
-                    className="flex items-center justify-between rounded-xl border border-border bg-navy-2 px-4 py-3"
+                    className={`rounded-xl border bg-navy-2 p-3 ${rankTone(p.rank)}`}
                   >
-                    <span className="font-display text-lg">
-                      {p.rank} · {p.make} {p.model}
-                    </span>
-                    <span className="text-sm text-silver">{p.rank}</span>
-                  </li>
-                ))
-              )}
-            </ul>
+                    <p className="font-display text-3xl tracking-wide">{p.rank}</p>
+                    <p className="mt-2 font-display text-lg leading-tight">
+                      {p.make}
+                    </p>
+                    <p className="text-sm text-silver">{p.model}</p>
+                    <p className="mt-3 text-xs tracking-[0.2em] text-muted">
+                      {SLOT_LABEL[p.slot].toUpperCase()}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
         );
       })}
