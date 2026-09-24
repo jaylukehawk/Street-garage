@@ -92,9 +92,11 @@ function PartIcon({ slot }: { slot: GaragePart["slot"] }) {
                   >
                                         <div className="flex items-start justify-between">
                       <PartIcon slot={p.slot} />
-                      <p className="font-display text-7xl leading-none tracking-wide">
-                        {p.rank}
-                      </p>
+                                            <img
+                        src={`/ranks/${p.rank}.jpg`}
+                        alt={p.rank}
+                        className="h-20 w-14 rounded-sm object-cover"
+                      />
                     </div>
                     <p className="mt-2 font-display text-lg leading-tight">
                       {p.make}
