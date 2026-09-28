@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import { SAVE_VERSION, type DemoPurchase, type GpsPreference, type Sighting } from "./types";
 import { rollPart, type GaragePart } from "./parts";
 import type { DecalId, SavedBuild, VinylId } from "./builds";
-import { rollStreetDecal, type StreetDecalId } from "./street-decals";
+import { rollStreetDecal, type CollectibleDecalId } from "./street-decals";
 import { buildSeedSightings, countUsedToday } from "./seed";
 import { isDuplicateSighting } from "./geo";
 import { duplicateWindowMs, rankIndex, rankProgress, scanCap, xpFromSightings, type RankProgress } from "./ranks";
@@ -23,7 +23,7 @@ type AddResult =
       promotedTo: string | null;
       partDropped: boolean;
       part: GaragePart | null;
-      decalDropped: StreetDecalId | null;
+      decalDropped: CollectibleDecalId | null;
     }
   | { ok: false; reason: "limit" | "duplicate" };
 

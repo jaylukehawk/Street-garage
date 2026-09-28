@@ -13,7 +13,7 @@ import { identifyVehicle } from "@/lib/identify";
 import { prepareScanPhoto, resizeToJpeg } from "@/lib/image";
 import { requestPosition } from "@/lib/geo";
 import type { GaragePart } from "@/lib/parts";
-import type { StreetDecalId } from "@/lib/street-decals";
+import type { CollectibleDecalId } from "@/lib/street-decals";
 import { useGarageStore } from "@/lib/store";
 import { scanCap } from "@/lib/ranks";
 import { CogAmount } from "@/components/cog-amount";
@@ -38,7 +38,7 @@ function ScanPage() {
   const setGps = useGarageStore((s) => s.setGpsPreference);
 
   const [dropped, setDropped] = useState<GaragePart | null>(null);
-  const [droppedDecal, setDroppedDecal] = useState<StreetDecalId | null>(null);
+  const [droppedDecal, setDroppedDecal] = useState<CollectibleDecalId | null>(null);
   const [afterDropId, setAfterDropId] = useState<string | null>(null);
   const [stage, setStage] = useState<Stage>("live");
   const [cameraError, setCameraError] = useState<string | null>(null);

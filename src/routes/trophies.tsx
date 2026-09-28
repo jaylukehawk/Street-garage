@@ -16,7 +16,7 @@ import {
   type Rank,
 } from "@/lib/ranks";
 import { decalSrc } from "@/lib/builds";
-import { STREET_DECALS } from "@/lib/street-decals";
+import { FLAG_DECALS, FLAG_RARE_DECALS, STREET_DECALS } from "@/lib/street-decals";
 import { useGarageStore } from "@/lib/store";
 import { cn, slugify } from "@/lib/utils";
 
@@ -155,7 +155,7 @@ function TrophiesPage() {
       <section className="mt-8">
         <h2 className="font-display text-xl tracking-wide">Street decals</h2>
         <p className="mt-1 text-sm text-muted">
-          {ownedDecals.length}/{STREET_DECALS.length} unlocked · random drop on scan
+          {STREET_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{STREET_DECALS.length} unlocked · 3% drop on scan
         </p>
         <div className="mt-4 grid grid-cols-5 gap-2">
           {STREET_DECALS.map((row) => {
@@ -165,6 +165,48 @@ function TrophiesPage() {
                 key={row.id}
                 className={`overflow-hidden rounded-full border ${
                   free ? "border-[#f0d48a]" : "border-border opacity-35"
+                }`}
+              >
+                <img src={decalSrc(row.id) ?? ""} alt={free ? row.label : "Locked"} className="aspect-square w-full object-cover" />
+              </div>
+            );
+          })}
+        </div>
+      </section>
+      <section className="mt-8">
+        <h2 className="font-display text-xl tracking-wide">Flag decals</h2>
+        <p className="mt-1 text-sm text-muted">
+          {FLAG_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_DECALS.length} unlocked · same 3% pool
+        </p>
+        <div className="mt-4 grid grid-cols-5 gap-2">
+          {FLAG_DECALS.map((row) => {
+            const free = ownedDecals.includes(row.id);
+            return (
+              <div
+                key={row.id}
+                className={`overflow-hidden rounded-full border ${
+                  free ? "border-[#f0d48a]" : "border-border opacity-35"
+                }`}
+              >
+                <img src={decalSrc(row.id) ?? ""} alt={free ? row.label : "Locked"} className="aspect-square w-full object-cover" />
+              </div>
+            );
+          })}
+        </div>
+      </section>
+      <section className="mt-8">
+        <h2 className="font-display text-xl tracking-wide">Gold flags</h2>
+        <p className="mt-1 text-sm text-muted">
+          {FLAG_RARE_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_RARE_DECALS.length} unlocked · foil variants, 10× rarer
+        </p>
+        <div className="mt-4 grid grid-cols-5 gap-2">
+          {FLAG_RARE_DECALS.map((row) => {
+            const free = ownedDecals.includes(row.id);
+            return (
+              <div
+                key={row.id}
+                className={`overflow-hidden rounded-full border ${
+                  free ? "border-[#ffe7a0]" : "border-border opacity-35"
                 }`}
               >
                 <img src={decalSrc(row.id) ?? ""} alt={free ? row.label : "Locked"} className="aspect-square w-full object-cover" />

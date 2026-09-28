@@ -1,4 +1,4 @@
-import { STREET_DECALS } from "./street-decals";
+import { COLLECTIBLE_DECALS } from "./street-decals";
 import { matchesSpecial } from "./specials";
 import type { Sighting } from "./types";
 
@@ -35,7 +35,7 @@ export type VinylId = (typeof VINYLS)[number]["id"];
 
 export const DECALS = [
   { id: "none", label: "None" },
-  ...STREET_DECALS,
+  ...COLLECTIBLE_DECALS,
 ];
 
 export type DecalId = string;

@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 import { Lock, Sticker } from "lucide-react";
 import {
   BUILD_LABEL,
-  DECALS,
   VINYLS,
   buildClassFor,
   decalSrc,
@@ -21,7 +20,7 @@ import {
   type PartRank,
 } from "@/lib/parts";
 import { CogAmount } from "@/components/cog-amount";
-import { STREET_DECALS } from "@/lib/street-decals";
+import { FLAG_DECALS, FLAG_RARE_DECALS, STREET_DECALS } from "@/lib/street-decals";
 import { BUILD_SLOT_COST, SLOT_PACK_COST, modelKey, useGarageStore } from "@/lib/store";
 
 export const Route = createFileRoute("/garage")({ component: GaragePage });
@@ -379,10 +378,10 @@ function CarBuild({
                   <div className="mt-3 rounded-xl border border-border bg-navy-2 p-3">
                     <p className="font-display text-lg">Decals</p>
                     <p className="mt-1 text-sm text-muted">
-                      {ownedDecals.length}/{STREET_DECALS.length} unlocked · random drop when you scan
+                      {ownedDecals.length}/{STREET_DECALS.length + FLAG_DECALS.length + FLAG_RARE_DECALS.length} unlocked · 3% drop when you scan
                     </p>
                     <div className="mt-3 grid grid-cols-4 gap-2">
-                      {DECALS.map((decal) => {
+                      {[{ id: "none", label: "None" }, ...STREET_DECALS].map((decal) => {
                         const free = decalUnlocked(decal.id, ownedDecals);
                         const src = decalSrc(decal.id);
                         return (
@@ -412,8 +411,70 @@ function CarBuild({
                         );
                       })}
                     </div>
+                    <p className="mt-4 font-display text-lg">Flags</p>
+                    <p className="mt-1 text-sm text-muted">
+                      {FLAG_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_DECALS.length} unlocked
+                    </p>
+                    <div className="mt-3 grid grid-cols-4 gap-2">
+                      {FLAG_DECALS.map((decal) => {
+                        const free = decalUnlocked(decal.id, ownedDecals);
+                        const src = decalSrc(decal.id);
+                        return (
+                          <button
+                            key={decal.id}
+                            type="button"
+                            disabled={!free}
+                            onClick={() => free && setDecal(car.make, car.model, decal.id)}
+                            className={`overflow-hidden rounded-md border text-xs ${
+                              (build.decal ?? "none") === decal.id
+                                ? "border-[#f0d48a] text-[#f0d48a]"
+                                : "border-border text-silver"
+                            } disabled:opacity-40`}
+                          >
+                            <span className="relative block">
+                              <img src={src ?? ""} alt="" className="h-14 w-full object-contain bg-navy" />
+                              {free ? null : (
+                                <Lock className="absolute right-1 top-1 size-3 text-silver" />
+                              )}
+                            </span>
+                            <span className="block truncate px-1 py-1">{decal.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="mt-4 font-display text-lg">Gold flags</p>
+                    <p className="mt-1 text-sm text-muted">
+                      {FLAG_RARE_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_RARE_DECALS.length} unlocked · 10× rarer
+                    </p>
+                    <div className="mt-3 grid grid-cols-4 gap-2">
+                      {FLAG_RARE_DECALS.map((decal) => {
+                        const free = decalUnlocked(decal.id, ownedDecals);
+                        const src = decalSrc(decal.id);
+                        return (
+                          <button
+                            key={decal.id}
+                            type="button"
+                            disabled={!free}
+                            onClick={() => free && setDecal(car.make, car.model, decal.id)}
+                            className={`overflow-hidden rounded-md border text-xs ${
+                              (build.decal ?? "none") === decal.id
+                                ? "border-[#ffe7a0] text-[#f0d48a]"
+                                : "border-[#f0d48a]/40 text-silver"
+                            } disabled:opacity-40`}
+                          >
+                            <span className="relative block">
+                              <img src={src ?? ""} alt="" className="h-14 w-full object-contain bg-navy" />
+                              {free ? null : (
+                                <Lock className="absolute right-1 top-1 size-3 text-silver" />
+                              )}
+                            </span>
+                            <span className="block truncate px-1 py-1">{decal.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                ) : null}
+                ) : null}}
                 {build ? (
                   <button
                     type="button"

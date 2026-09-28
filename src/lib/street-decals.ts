@@ -49,15 +49,130 @@ export const STREET_DECALS = [
   { id: "horn", label: "Horn" },
   { id: "mask", label: "Mask" },
   { id: "spark", label: "Spark" },
+  { id: "wrench", label: "Wrench" },
+  { id: "gear", label: "Gear" },
+  { id: "turbo", label: "Turbo" },
+  { id: "helmet", label: "Helmet" },
+  { id: "chain", label: "Chain" },
+  { id: "key", label: "Key" },
+  { id: "horseshoe", label: "Horseshoe" },
+  { id: "clover", label: "Clover" },
+  { id: "star", label: "Star" },
+  { id: "eagle", label: "Eagle" },
+  { id: "dragon", label: "Dragon" },
+  { id: "panther", label: "Panther" },
+  { id: "lion", label: "Lion" },
+  { id: "tiger", label: "Tiger" },
+  { id: "viper", label: "Viper" },
+  { id: "hawk", label: "Hawk" },
+  { id: "owl", label: "Owl" },
+  { id: "octopus", label: "Octopus" },
+  { id: "sword", label: "Sword" },
+  { id: "shield", label: "Shield" },
+  { id: "trident", label: "Trident" },
+  { id: "record", label: "Record" },
+  { id: "guitar", label: "Guitar" },
+  { id: "camera", label: "Camera" },
+  { id: "spray", label: "Spray" },
+  { id: "cone", label: "Cone" },
+  { id: "target", label: "Target" },
+  { id: "diamond", label: "Diamond" },
+  { id: "spade", label: "Spade" },
+  { id: "club", label: "Club" },
+  { id: "coin", label: "Coin" },
+  { id: "gas", label: "Gas" },
+  { id: "battery", label: "Battery" },
+  { id: "spoiler", label: "Spoiler" },
+  { id: "headlight", label: "Headlight" },
+  { id: "grill", label: "Grill" },
+  { id: "laurel", label: "Laurel" },
+  { id: "medal", label: "Medal" },
+  { id: "rabbit", label: "Rabbit" },
+  { id: "raven", label: "Raven" },
+  { id: "cloud", label: "Cloud" },
+  { id: "snow", label: "Snow" },
+  { id: "zap", label: "Zap" },
+  { id: "drop", label: "Drop" },
+  { id: "smoke", label: "Smoke" },
+  { id: "exhaust", label: "Exhaust" },
+  { id: "knuckle", label: "Knuckle" },
+  { id: "tape", label: "Tape" },
+  { id: "speaker", label: "Speaker" },
+  { id: "fuse", label: "Fuse" },
 ] as const;
 
+export const FLAG_DECALS = [
+  { id: "flag-gb", label: "UK" },
+  { id: "flag-us", label: "USA" },
+  { id: "flag-jp", label: "Japan" },
+  { id: "flag-de", label: "Germany" },
+  { id: "flag-it", label: "Italy" },
+  { id: "flag-fr", label: "France" },
+  { id: "flag-se", label: "Sweden" },
+  { id: "flag-kr", label: "Korea" },
+  { id: "flag-es", label: "Spain" },
+  { id: "flag-au", label: "Australia" },
+  { id: "flag-ca", label: "Canada" },
+  { id: "flag-nl", label: "Netherlands" },
+  { id: "flag-ch", label: "Switzerland" },
+  { id: "flag-at", label: "Austria" },
+  { id: "flag-cz", label: "Czechia" },
+  { id: "flag-pl", label: "Poland" },
+  { id: "flag-br", label: "Brazil" },
+  { id: "flag-mx", label: "Mexico" },
+  { id: "flag-ar", label: "Argentina" },
+  { id: "flag-cn", label: "China" },
+  { id: "flag-in", label: "India" },
+  { id: "flag-ae", label: "UAE" },
+  { id: "flag-za", label: "South Africa" },
+  { id: "flag-ie", label: "Ireland" },
+  { id: "flag-be", label: "Belgium" },
+  { id: "flag-pt", label: "Portugal" },
+  { id: "flag-fi", label: "Finland" },
+  { id: "flag-no", label: "Norway" },
+  { id: "flag-dk", label: "Denmark" },
+  { id: "flag-tr", label: "Turkey" },
+  { id: "flag-th", label: "Thailand" },
+  { id: "flag-nz", label: "New Zealand" },
+  { id: "flag-check", label: "Checkered" },
+  { id: "flag-green", label: "Green Flag" },
+  { id: "flag-yellow", label: "Yellow Flag" },
+  { id: "flag-red", label: "Red Flag" },
+] as const;
+
+export const FLAG_RARE_DECALS = FLAG_DECALS.map((row) => ({
+  id: `${row.id}-rare`,
+  label: `${row.label} Gold`,
+})) as readonly { id: `${(typeof FLAG_DECALS)[number]["id"]}-rare`; label: string }[];
+
+export const COLLECTIBLE_DECALS = [...STREET_DECALS, ...FLAG_DECALS, ...FLAG_RARE_DECALS] as const;
+
 export type StreetDecalId = (typeof STREET_DECALS)[number]["id"];
+export type FlagDecalId = (typeof FLAG_DECALS)[number]["id"];
+export type FlagRareDecalId = (typeof FLAG_RARE_DECALS)[number]["id"];
+export type CollectibleDecalId = (typeof COLLECTIBLE_DECALS)[number]["id"];
 
 export const DECAL_DROP_CHANCE = 0.03;
+export const RARE_FLAG_WEIGHT = 1;
+export const COMMON_DECAL_WEIGHT = 10;
 
-export function rollStreetDecal(owned: string[]): StreetDecalId | null {
-  const locked = STREET_DECALS.map((row) => row.id).filter((id) => !owned.includes(id));
+export function isRareDecal(id: string) {
+  return id.endsWith("-rare");
+}
+
+export function decalMeta(id: string) {
+  return COLLECTIBLE_DECALS.find((row) => row.id === id);
+}
+
+export function rollStreetDecal(owned: string[]): CollectibleDecalId | null {
+  const locked = COLLECTIBLE_DECALS.map((row) => row.id).filter((id) => !owned.includes(id));
   if (locked.length === 0) return null;
   if (Math.random() > DECAL_DROP_CHANCE) return null;
-  return locked[Math.floor(Math.random() * locked.length)]!;
+  const weights = locked.map((id) => (isRareDecal(id) ? RARE_FLAG_WEIGHT : COMMON_DECAL_WEIGHT));
+  let ticket = Math.random() * weights.reduce((sum, w) => sum + w, 0);
+  for (let i = 0; i < locked.length; i++) {
+    ticket -= weights[i]!;
+    if (ticket <= 0) return locked[i]!;
+  }
+  return locked[locked.length - 1]!;
 }
