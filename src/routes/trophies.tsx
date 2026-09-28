@@ -104,7 +104,7 @@ function TrophiesPage() {
       <section className="mt-8">
         <h2 className="font-display text-xl tracking-wide">Make plates</h2>
         <p className="mt-1 text-sm text-muted">
-          {unlocked} unlocked · Bronze at 10
+          {unlocked} unlocked
         </p>
         <div className="cabinet mt-4">
           <div className="cabinet-inner">
@@ -134,9 +134,6 @@ function TrophiesPage() {
       </section>
       <section className="mt-8">
         <h2 className="font-display text-xl tracking-wide">Class badges</h2>
-        <p className="mt-1 text-sm text-muted">
-          Same metal as makes. Bronze 10 · Silver 100 · Gold 500 · Platinum 2,500 · Diamond 10,000.
-        </p>
         <div className="cabinet mt-4">
           <div className="cabinet-inner">
             <div className="cabinet-header">
@@ -155,7 +152,7 @@ function TrophiesPage() {
       <section className="mt-8">
         <h2 className="font-display text-xl tracking-wide">Street decals</h2>
         <p className="mt-1 text-sm text-muted">
-          {STREET_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{STREET_DECALS.length} unlocked · 3% drop on scan
+          {STREET_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{STREET_DECALS.length} unlocked
         </p>
         <div className="mt-4 grid grid-cols-5 gap-2">
           {STREET_DECALS.map((row) => {
@@ -176,7 +173,7 @@ function TrophiesPage() {
       <section className="mt-8">
         <h2 className="font-display text-xl tracking-wide">Flag decals</h2>
         <p className="mt-1 text-sm text-muted">
-          {FLAG_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_DECALS.length} unlocked · same 3% pool
+          {FLAG_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_DECALS.length} unlocked
         </p>
         <div className="mt-4 grid grid-cols-5 gap-2">
           {FLAG_DECALS.map((row) => {
@@ -197,7 +194,7 @@ function TrophiesPage() {
       <section className="mt-8">
         <h2 className="font-display text-xl tracking-wide">Gold flags</h2>
         <p className="mt-1 text-sm text-muted">
-          {FLAG_RARE_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_RARE_DECALS.length} unlocked · foil variants, 10× rarer
+          {FLAG_RARE_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_RARE_DECALS.length} unlocked
         </p>
         <div className="mt-4 grid grid-cols-5 gap-2">
           {FLAG_RARE_DECALS.map((row) => {

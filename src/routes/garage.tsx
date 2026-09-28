@@ -386,7 +386,7 @@ function CarBuild({
                   <div className="mt-3 rounded-xl border border-border bg-navy-2 p-3">
                     <p className="font-display text-lg">Decals</p>
                     <p className="mt-1 text-sm text-muted">
-                      {ownedDecals.length}/{STREET_DECALS.length + FLAG_DECALS.length + FLAG_RARE_DECALS.length} unlocked · 3% drop when you scan
+                      {ownedDecals.length}/{STREET_DECALS.length + FLAG_DECALS.length + FLAG_RARE_DECALS.length} unlocked
                     </p>
                     <div className="mt-3 grid grid-cols-4 gap-2">
                       {[{ id: "none", label: "None" }, ...STREET_DECALS].map((decal) => {
@@ -452,7 +452,7 @@ function CarBuild({
                     </div>
                     <p className="mt-4 font-display text-lg">Gold flags</p>
                     <p className="mt-1 text-sm text-muted">
-                      {FLAG_RARE_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_RARE_DECALS.length} unlocked · 10× rarer
+                      {FLAG_RARE_DECALS.filter((row) => ownedDecals.includes(row.id)).length}/{FLAG_RARE_DECALS.length} unlocked
                     </p>
                     <div className="mt-3 grid grid-cols-4 gap-2">
                       {FLAG_RARE_DECALS.map((decal) => {
