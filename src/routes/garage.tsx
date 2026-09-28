@@ -21,7 +21,7 @@ import {
   type PartRank,
 } from "@/lib/parts";
 import { CogAmount } from "@/components/cog-amount";
-import { rankProgress, xpFromSightings } from "@/lib/ranks";
+import { STREET_DECALS } from "@/lib/street-decals";
 import { BUILD_SLOT_COST, SLOT_PACK_COST, modelKey, useGarageStore } from "@/lib/store";
 
 export const Route = createFileRoute("/garage")({ component: GaragePage });
@@ -283,8 +283,7 @@ function CarBuild({
   const setDecal = useGarageStore((s) => s.setDecal);
   const clearBuild = useGarageStore((s) => s.clearBuild);
   const [decalOpen, setDecalOpen] = useState(false);
-  const sightings = useGarageStore((s) => s.sightings);
-  const currentRank = rankProgress(xpFromSightings(sightings)).rank;
+  const ownedDecals = useGarageStore((s) => s.ownedDecals ?? []);
   const canBuild = useGarageStore((s) => s.canBuild);
   const buyBuildSlot = useGarageStore((s) => s.buyBuildSlot);
   const builtCount = useGarageStore((s) => s.builtCount());
@@ -380,11 +379,11 @@ function CarBuild({
                   <div className="mt-3 rounded-xl border border-border bg-navy-2 p-3">
                     <p className="font-display text-lg">Decals</p>
                     <p className="mt-1 text-sm text-muted">
-                      Promote a rank to unlock the next badge. Pips inside a rank do not count.
+                      {ownedDecals.length}/{STREET_DECALS.length} unlocked · random drop when you scan
                     </p>
                     <div className="mt-3 grid grid-cols-4 gap-2">
                       {DECALS.map((decal) => {
-                        const free = decalUnlocked(decal.rankId, currentRank);
+                        const free = decalUnlocked(decal.id, ownedDecals);
                         const src = decalSrc(decal.id);
                         return (
                           <button

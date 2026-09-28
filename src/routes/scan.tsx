@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BookmarkButton } from "@/components/bookmark-button";
+import { DecalDrop } from "@/components/decal-drop";
 import { PartDrop } from "@/components/part-drop";
 import { RefillSheet } from "@/components/refill-sheet";
 import { COLOURS, DEFAULT_MAKE, MAKE_NAMES, modelsFor, nearestMake } from "@/lib/catalog";
@@ -12,6 +13,7 @@ import { identifyVehicle } from "@/lib/identify";
 import { prepareScanPhoto, resizeToJpeg } from "@/lib/image";
 import { requestPosition } from "@/lib/geo";
 import type { GaragePart } from "@/lib/parts";
+import type { StreetDecalId } from "@/lib/street-decals";
 import { useGarageStore } from "@/lib/store";
 import { scanCap } from "@/lib/ranks";
 import { CogAmount } from "@/components/cog-amount";
@@ -36,6 +38,7 @@ function ScanPage() {
   const setGps = useGarageStore((s) => s.setGpsPreference);
 
   const [dropped, setDropped] = useState<GaragePart | null>(null);
+  const [droppedDecal, setDroppedDecal] = useState<StreetDecalId | null>(null);
   const [afterDropId, setAfterDropId] = useState<string | null>(null);
   const [stage, setStage] = useState<Stage>("live");
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -198,11 +201,12 @@ function ScanPage() {
         setRefillOpen(true);
         return;
       }
-      if (result.part) {
+      if (result.part || result.decalDropped) {
         setDropped(result.part);
+        setDroppedDecal(result.decalDropped);
         setAfterDropId(result.sighting.id);
       } else {
-        toast(`Logged · ${make} ${model} · +${result.xpGained} XP · garage full`);
+        toast(`Logged · ${make} ${model} · +${result.xpGained} XP`);
         navigate({ to: "/history/$id", params: { id: result.sighting.id } });
       }
     } finally {
@@ -432,8 +436,20 @@ function ScanPage() {
         <PartDrop
           part={dropped}
           onDone={() => {
-            const id = afterDropId;
             setDropped(null);
+            if (!droppedDecal) {
+              const id = afterDropId;
+              setAfterDropId(null);
+              if (id) navigate({ to: "/history/$id", params: { id } });
+            }
+          }}
+        />
+      ) : droppedDecal ? (
+        <DecalDrop
+          id={droppedDecal}
+          onDone={() => {
+            const id = afterDropId;
+            setDroppedDecal(null);
             setAfterDropId(null);
             if (id) navigate({ to: "/history/$id", params: { id } });
           }}

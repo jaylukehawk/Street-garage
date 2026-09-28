@@ -1,4 +1,4 @@
-import { RANKS, rankIndex, type Rank } from "./ranks";
+import { STREET_DECALS } from "./street-decals";
 import { matchesSpecial } from "./specials";
 import type { Sighting } from "./types";
 
@@ -34,20 +34,15 @@ export const VINYLS = [
 export type VinylId = (typeof VINYLS)[number]["id"];
 
 export const DECALS = [
-  { id: "none", label: "None", rankId: null as string | null },
-  ...RANKS.map((rank) => ({
-    id: rank.id,
-    label: rank.label,
-    rankId: rank.id as string | null,
-  })),
+  { id: "none", label: "None" },
+  ...STREET_DECALS,
 ];
 
 export type DecalId = string;
 
-export function decalUnlocked(rankId: string | null, current: Rank) {
-  if (!rankId) return true;
-  const need = RANKS.findIndex((row) => row.id === rankId);
-  return need >= 0 && rankIndex(current) >= need;
+export function decalUnlocked(id: string, owned: string[]) {
+  if (!id || id === "none") return true;
+  return owned.includes(id);
 }
 
 export type SavedBuild = {

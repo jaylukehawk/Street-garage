@@ -15,6 +15,8 @@ import {
   xpFromSightings,
   type Rank,
 } from "@/lib/ranks";
+import { decalSrc } from "@/lib/builds";
+import { STREET_DECALS } from "@/lib/street-decals";
 import { useGarageStore } from "@/lib/store";
 import { cn, slugify } from "@/lib/utils";
 
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/trophies")({ component: TrophiesPage });
 
 function TrophiesPage() {
   const sightings = useGarageStore((s) => s.sightings);
+  const ownedDecals = useGarageStore((s) => s.ownedDecals ?? []);
   const xp = xpFromSightings(sightings);
   const progress = rankProgress(xp);
   const [lockedRank, setLockedRank] = useState<Rank | null>(null);
@@ -147,6 +150,27 @@ function TrophiesPage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+      <section className="mt-8">
+        <h2 className="font-display text-xl tracking-wide">Street decals</h2>
+        <p className="mt-1 text-sm text-muted">
+          {ownedDecals.length}/{STREET_DECALS.length} unlocked · random drop on scan
+        </p>
+        <div className="mt-4 grid grid-cols-5 gap-2">
+          {STREET_DECALS.map((row) => {
+            const free = ownedDecals.includes(row.id);
+            return (
+              <div
+                key={row.id}
+                className={`overflow-hidden rounded-full border ${
+                  free ? "border-[#f0d48a]" : "border-border opacity-35"
+                }`}
+              >
+                <img src={decalSrc(row.id) ?? ""} alt={free ? row.label : "Locked"} className="aspect-square w-full object-cover" />
+              </div>
+            );
+          })}
         </div>
       </section>
       <RankLockedSheet

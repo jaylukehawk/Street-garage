@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import { SAVE_VERSION, type DemoPurchase, type GpsPreference, type Sighting } from "./types";
 import { rollPart, type GaragePart } from "./parts";
 import type { DecalId, SavedBuild, VinylId } from "./builds";
+import { rollStreetDecal, type StreetDecalId } from "./street-decals";
 import { buildSeedSightings, countUsedToday } from "./seed";
 import { isDuplicateSighting } from "./geo";
 import { duplicateWindowMs, rankIndex, rankProgress, scanCap, xpFromSightings, type RankProgress } from "./ranks";
@@ -22,6 +23,7 @@ type AddResult =
       promotedTo: string | null;
       partDropped: boolean;
       part: GaragePart | null;
+      decalDropped: StreetDecalId | null;
     }
   | { ok: false; reason: "limit" | "duplicate" };
 
@@ -66,6 +68,7 @@ type GarageState = {
   slotBoosts: Record<string, number>;
   builds: Record<string, SavedBuild>;
   extraBuildSlots: number;
+  ownedDecals: string[];
   setGaragePlus: (on: boolean) => void;
   setBuild: (
     make: string,
@@ -101,6 +104,7 @@ export const useGarageStore = create<GarageState>()(
       slotBoosts: {},
       builds: {},
       extraBuildSlots: 0,
+      ownedDecals: [],
       setGaragePlus: (on) => set({ garagePlus: on }),
       buildCap: () => BASE_BUILD_CAP + (get().extraBuildSlots ?? 0),
       builtCount: () => Object.keys(get().builds ?? {}).length,
@@ -234,9 +238,12 @@ export const useGarageStore = create<GarageState>()(
         const part = partDropped
           ? rollPart(sighting.make, sighting.model, sighting.id)
           : null;
+        const ownedDecals = state.ownedDecals ?? [];
+        const decalDropped = rollStreetDecal(ownedDecals);
         set({
           sightings: nextSightings,
           parts: part ? [...(state.parts ?? []), part] : (state.parts ?? []),
+          ownedDecals: decalDropped ? [...ownedDecals, decalDropped] : ownedDecals,
           scansUsedToday: state.scansUsedToday + 1,
           pendingPromotion: promotedTo,
           pendingPipFill: pipFilled || promotedTo ? { from: beforeRank, to: afterRank } : null,
@@ -244,7 +251,7 @@ export const useGarageStore = create<GarageState>()(
             ? [sighting.id, ...(state.favouriteIds ?? []).filter((id) => id !== sighting.id)]
             : (state.favouriteIds ?? []),
         });
-        return { ok: true, sighting, xpGained, promotedTo, partDropped, part };
+        return { ok: true, sighting, xpGained, promotedTo, partDropped, part, decalDropped };
       },
       toggleFavourite: (id) => {
         const state = get();
@@ -315,6 +322,7 @@ export const useGarageStore = create<GarageState>()(
         slotBoosts: state.slotBoosts ?? {},
         builds: state.builds ?? {},
         extraBuildSlots: state.extraBuildSlots ?? 0,
+        ownedDecals: state.ownedDecals ?? [],
       }),
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<GarageState>;
@@ -336,6 +344,7 @@ export const useGarageStore = create<GarageState>()(
             ]),
           ),
           extraBuildSlots: typeof saved.extraBuildSlots === "number" ? saved.extraBuildSlots : 0,
+          ownedDecals: Array.isArray(saved.ownedDecals) ? saved.ownedDecals : [],
         };
       },
     },
