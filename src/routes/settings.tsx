@@ -94,12 +94,24 @@ function SettingsPage() {
         </Link>
       </section>
       <section className="mt-4 rounded-xl border border-border bg-navy-2 p-4">
-        <h2 className="font-display text-xl tracking-wide">Privacy</h2>
+        <h2 className="font-display text-xl tracking-wide">Legal</h2>
         <p className="mt-2 text-sm leading-relaxed text-silver">
           We do not store plates or owner details. Number plates are covered on
           every saved sighting and are never transcribed. Owners are never looked
           up. Map location is saved only if you allow GPS.
         </p>
+        <Link
+          to="/privacy"
+          className="mt-3 flex min-h-12 items-center justify-center rounded-md border border-border font-display text-lg"
+        >
+          Privacy policy
+        </Link>
+        <Link
+          to="/terms"
+          className="mt-2 flex min-h-12 items-center justify-center rounded-md border border-border font-display text-lg"
+        >
+          Terms
+        </Link>
       </section>
 
       <RefillSheet open={refillOpen} onOpenChange={setRefillOpen} />

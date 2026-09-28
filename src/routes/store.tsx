@@ -26,7 +26,7 @@ function StorePage() {
         <CogAmount amount={cogs} className="font-display text-2xl text-[#f0d48a]" />
       </div>
       <p className="mt-2 text-sm text-muted">
-        Prototype packs. No card is taken yet. Google Play billing comes later.
+        Preview cogs for testing. No payment is taken. Play Billing comes in a later update.
       </p>
 
       <section className="mt-6 space-y-3">
@@ -44,7 +44,7 @@ function StorePage() {
                   toast(`Added ${pack.amount}`);
                 }}
               >
-                Buy
+                Add preview
               </Button>
             </div>
           </article>

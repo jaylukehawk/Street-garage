@@ -19,6 +19,8 @@ import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as TrophiesRouteImport } from './routes/trophies'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as CollectionIndexRouteImport } from './routes/collection.index'
 import { Route as CollectionMakeRouteImport } from './routes/collection.$make'
 import { Route as HistoryIndexRouteImport } from './routes/history.index'
@@ -74,6 +76,16 @@ const TrophiesRoute = TrophiesRouteImport.update({
   path: '/trophies',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionIndexRoute = CollectionIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -106,6 +118,8 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/store': typeof StoreRoute
   '/trophies': typeof TrophiesRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/collection/$make': typeof CollectionMakeRoute
   '/history/$id': typeof HistoryIdRoute
   '/collection/': typeof CollectionIndexRoute
@@ -120,6 +134,8 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/store': typeof StoreRoute
   '/trophies': typeof TrophiesRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/collection/$make': typeof CollectionMakeRoute
   '/history/$id': typeof HistoryIdRoute
   '/collection': typeof CollectionIndexRoute
@@ -137,6 +153,8 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/store': typeof StoreRoute
   '/trophies': typeof TrophiesRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/collection/$make': typeof CollectionMakeRoute
   '/history/$id': typeof HistoryIdRoute
   '/collection/': typeof CollectionIndexRoute
@@ -155,6 +173,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/store'
     | '/trophies'
+    | '/privacy'
+    | '/terms'
     | '/collection/$make'
     | '/history/$id'
     | '/collection/'
@@ -169,6 +189,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/store'
     | '/trophies'
+    | '/privacy'
+    | '/terms'
     | '/collection/$make'
     | '/history/$id'
     | '/collection'
@@ -185,6 +207,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/store'
     | '/trophies'
+    | '/privacy'
+    | '/terms'
     | '/collection/$make'
     | '/history/$id'
     | '/collection/'
@@ -202,6 +226,8 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   StoreRoute: typeof StoreRoute
   TrophiesRoute: typeof TrophiesRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -276,6 +302,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrophiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/collection/': {
       id: '/collection/'
       path: '/'
@@ -345,6 +385,8 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   StoreRoute: StoreRoute,
   TrophiesRoute: TrophiesRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
