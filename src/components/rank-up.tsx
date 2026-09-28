@@ -94,6 +94,13 @@ export function RankUp() {
         <div className="rank-plate-reveal relative z-10 mt-6 w-full max-w-sm">
           <RankPlate rank={event.to.rank} current roman="I" pips={1} />
           <p className="mt-4 font-display text-lg tracking-wide text-silver">{perkUnlockNote(event.to.rank)}</p>
+          {event.from.rank.id !== event.to.rank.id ? (
+            <img
+              src={`/decals/${event.to.rank.id}.png`}
+              alt=""
+              className="mx-auto mt-3 size-16 object-contain"
+            />
+          ) : null}
         </div>
       ) : (
         <div className="relative z-10 mt-6 w-full max-w-sm rounded-lg border border-border bg-navy-2 px-4 py-3 text-left">

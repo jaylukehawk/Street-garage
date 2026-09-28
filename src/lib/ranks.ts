@@ -215,6 +215,7 @@ export function perkUnlockNote(rank: Rank) {
   if (i === 0) parts.push(`${DAILY_SCAN_LIMIT} scans a day`);
   else if (gain > 0) parts.push(`+${gain} daily scans`);
   if (mins !== prevMins) parts.push(`${mins}-min re-log window`);
+  if (i > 0) parts.push("new garage decal");
   return parts.join(" · ") || `${DAILY_SCAN_LIMIT} scans a day`;
 }
 

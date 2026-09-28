@@ -1,3 +1,4 @@
+import { RANKS, rankIndex, type Rank } from "./ranks";
 import { matchesSpecial } from "./specials";
 import type { Sighting } from "./types";
 
@@ -33,10 +34,21 @@ export const VINYLS = [
 export type VinylId = (typeof VINYLS)[number]["id"];
 
 export const DECALS = [
-  { id: "none", label: "None" },
-] as const;
+  { id: "none", label: "None", rankId: null as string | null },
+  ...RANKS.map((rank) => ({
+    id: rank.id,
+    label: rank.label,
+    rankId: rank.id as string | null,
+  })),
+];
 
 export type DecalId = string;
+
+export function decalUnlocked(rankId: string | null, current: Rank) {
+  if (!rankId) return true;
+  const need = RANKS.findIndex((row) => row.id === rankId);
+  return need >= 0 && rankIndex(current) >= need;
+}
 
 export type SavedBuild = {
   design: string;

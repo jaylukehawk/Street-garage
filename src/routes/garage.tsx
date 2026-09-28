@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Sticker } from "lucide-react";
+import { Lock, Sticker } from "lucide-react";
 import {
   BUILD_LABEL,
   DECALS,
   VINYLS,
   buildClassFor,
   decalSrc,
+  decalUnlocked,
   designSrc,
   designsFor,
   type BuildClassId,
@@ -20,6 +21,7 @@ import {
   type PartRank,
 } from "@/lib/parts";
 import { CogAmount } from "@/components/cog-amount";
+import { rankProgress, xpFromSightings } from "@/lib/ranks";
 import { BUILD_SLOT_COST, SLOT_PACK_COST, modelKey, useGarageStore } from "@/lib/store";
 
 export const Route = createFileRoute("/garage")({ component: GaragePage });
@@ -281,6 +283,8 @@ function CarBuild({
   const setDecal = useGarageStore((s) => s.setDecal);
   const clearBuild = useGarageStore((s) => s.clearBuild);
   const [decalOpen, setDecalOpen] = useState(false);
+  const sightings = useGarageStore((s) => s.sightings);
+  const currentRank = rankProgress(xpFromSightings(sightings)).rank;
   const canBuild = useGarageStore((s) => s.canBuild);
   const buyBuildSlot = useGarageStore((s) => s.buyBuildSlot);
   const builtCount = useGarageStore((s) => s.builtCount());
@@ -376,23 +380,38 @@ function CarBuild({
                   <div className="mt-3 rounded-xl border border-border bg-navy-2 p-3">
                     <p className="font-display text-lg">Decals</p>
                     <p className="mt-1 text-sm text-muted">
-                      Stickers sit on the finished car. Drop new art in public/decals and add them to the list.
+                      Promote a rank to unlock the next badge. Pips inside a rank do not count.
                     </p>
                     <div className="mt-3 grid grid-cols-4 gap-2">
-                      {DECALS.map((decal) => (
-                        <button
-                          key={decal.id}
-                          type="button"
-                          onClick={() => setDecal(car.make, car.model, decal.id)}
-                          className={`min-h-10 rounded-md border text-xs ${
-                            (build.decal ?? "none") === decal.id
-                              ? "border-[#f0d48a] text-[#f0d48a]"
-                              : "border-border text-silver"
-                          }`}
-                        >
-                          {decal.label}
-                        </button>
-                      ))}
+                      {DECALS.map((decal) => {
+                        const free = decalUnlocked(decal.rankId, currentRank);
+                        const src = decalSrc(decal.id);
+                        return (
+                          <button
+                            key={decal.id}
+                            type="button"
+                            disabled={!free}
+                            onClick={() => free && setDecal(car.make, car.model, decal.id)}
+                            className={`overflow-hidden rounded-md border text-xs ${
+                              (build.decal ?? "none") === decal.id
+                                ? "border-[#f0d48a] text-[#f0d48a]"
+                                : "border-border text-silver"
+                            } disabled:opacity-40`}
+                          >
+                            {src ? (
+                              <span className="relative block">
+                                <img src={src} alt="" className="h-14 w-full object-contain bg-navy" />
+                                {free ? null : (
+                                  <Lock className="absolute right-1 top-1 size-3 text-silver" />
+                                )}
+                              </span>
+                            ) : (
+                              <span className="flex h-14 items-center justify-center">None</span>
+                            )}
+                            <span className="block truncate px-1 py-1">{decal.label}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 ) : null}
