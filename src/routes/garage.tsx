@@ -474,7 +474,7 @@ function CarBuild({
                       })}
                     </div>
                   </div>
-                ) : null}}
+                ) : null}
                 {build ? (
                   <button
                     type="button"
