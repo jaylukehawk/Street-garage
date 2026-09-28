@@ -1,6 +1,8 @@
 import { Drawer } from "vaul";
+import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
-import { REFILL_PRICE } from "@/lib/types";
+import { CogAmount } from "./cog-amount";
+import { SCAN_RESET_COST } from "@/lib/shop";
 import { scanCap } from "@/lib/ranks";
 import { formatDuration, msUntilMidnight } from "@/lib/utils";
 import { useGarageStore } from "@/lib/store";
@@ -13,9 +15,11 @@ export function RefillSheet({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const refill = useGarageStore((s) => s.refillScans);
-  const cap = useGarageStore((s) => scanCap(s.sightings));
+  const resetScans = useGarageStore((s) => s.resetScans);
+  const cogs = useGarageStore((s) => s.cogs ?? 0);
+  const cap = useGarageStore((s) => scanCap(s.sightings, s.garagePlus));
   const [left, setLeft] = useState(msUntilMidnight());
+  const short = cogs < SCAN_RESET_COST;
 
   useEffect(() => {
     if (!open) return;
@@ -30,25 +34,33 @@ export function RefillSheet({
         <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-lg rounded-t-2xl border border-border bg-navy-2 p-6 pb-10 outline-none">
           <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-border" />
           <Drawer.Title className="font-display text-3xl tracking-wide text-fg">
-            Refill {cap} scans
+            Reset {cap} scans
           </Drawer.Title>
           <p className="mt-2 text-silver">
-            {REFILL_PRICE} · prototype checkout. No card is taken.
+            Spend <CogAmount amount={SCAN_RESET_COST} className="align-middle" /> to refill today.
           </p>
           <p className="mt-4 text-sm text-muted">
             Next free reset at midnight · in {formatDuration(left)}
           </p>
-          <Button
-            className="mt-6 w-full"
-            size="lg"
-            variant="metal"
-            onClick={() => {
-              refill();
-              onOpenChange(false);
-            }}
-          >
-            Confirm
-          </Button>
+          {short ? (
+            <Button className="mt-6 w-full" size="lg" variant="metal" asChild>
+              <Link to="/store" onClick={() => onOpenChange(false)}>
+                Not enough · open Store
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              className="mt-6 w-full"
+              size="lg"
+              variant="metal"
+              onClick={() => {
+                const result = resetScans();
+                if (result.ok) onOpenChange(false);
+              }}
+            >
+              Reset · <CogAmount amount={SCAN_RESET_COST} />
+            </Button>
+          )}
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

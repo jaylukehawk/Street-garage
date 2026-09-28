@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { RefillSheet } from "@/components/refill-sheet";
 import { activePerkLines, rankProgress, scanCap, xpFromSightings } from "@/lib/ranks";
-import { REFILL_PRICE } from "@/lib/types";
+import { CogAmount } from "@/components/cog-amount";
+import { SCAN_RESET_COST } from "@/lib/shop";
 import { useGarageStore } from "@/lib/store";
 import { formatClock, formatDuration, msUntilMidnight } from "@/lib/utils";
 
@@ -55,7 +56,7 @@ function SettingsPage() {
             onClick={() => setRefillOpen(true)}
             className="mt-4 min-h-12 w-full rounded-md bg-silver font-display text-lg tracking-wide text-navy"
           >
-            Refill {cap} scans — {REFILL_PRICE}
+            Reset scans · <CogAmount amount={SCAN_RESET_COST} className="text-navy" iconClassName="text-navy" />
           </button>
         ) : null}
       </section>

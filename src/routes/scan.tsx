@@ -14,7 +14,9 @@ import { requestPosition } from "@/lib/geo";
 import type { GaragePart } from "@/lib/parts";
 import { useGarageStore } from "@/lib/store";
 import { scanCap } from "@/lib/ranks";
-import { REFILL_PRICE, type IdentifyResult } from "@/lib/types";
+import { CogAmount } from "@/components/cog-amount";
+import { SCAN_RESET_COST } from "@/lib/shop";
+import type { IdentifyResult } from "@/lib/types";
 
 export const Route = createFileRoute("/scan")({ component: ScanPage });
 
@@ -248,7 +250,7 @@ function ScanPage() {
                                  </>
               ) : (
                 <Button size="lg" variant="metal" className="mt-2 w-full max-w-sm" onClick={() => setRefillOpen(true)}>
-                  Refill {cap} scans — {REFILL_PRICE}
+                  Reset scans · <CogAmount amount={SCAN_RESET_COST} className="text-navy" iconClassName="text-navy" />
                 </Button>
               )}
               <p className="text-xs text-muted">Plates are blurred. Owners are never looked up.</p>
@@ -285,7 +287,7 @@ function ScanPage() {
               className="mb-4 min-h-12 w-full rounded-md bg-silver font-display text-lg text-navy"
               onClick={() => setRefillOpen(true)}
             >
-              Refill {cap} scans — {REFILL_PRICE}
+              Reset scans · <CogAmount amount={SCAN_RESET_COST} className="text-navy" iconClassName="text-navy" />
             </button>
           ) : (
             <div className="flex items-center justify-between gap-4">

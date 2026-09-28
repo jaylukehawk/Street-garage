@@ -15,6 +15,7 @@ import {
   type GaragePart,
   type PartRank,
 } from "@/lib/parts";
+import { CogAmount } from "@/components/cog-amount";
 import { BUILD_SLOT_COST, SLOT_PACK_COST, modelKey, useGarageStore } from "@/lib/store";
 
 export const Route = createFileRoute("/garage")({ component: GaragePage });
@@ -48,7 +49,6 @@ function GaragePage() {
   const parts = useGarageStore((s) => s.parts ?? []);
   const sightings = useGarageStore((s) => s.sightings);
   const cogs = useGarageStore((s) => s.cogs ?? 0);
-  const addCogs = useGarageStore((s) => s.addCogs);
   const partCap = useGarageStore((s) => s.partCap);
   const builds = useGarageStore((s) => s.builds ?? {});
   const builtCount = useGarageStore((s) => s.builtCount());
@@ -93,7 +93,7 @@ function GaragePage() {
           <h1 className="mt-1 font-display text-4xl tracking-wide">My Garage</h1>
         </div>
         <div className="text-right">
-          <p className="font-display text-lg text-[#f0d48a]">{cogs} Cogs</p>
+          <CogAmount amount={cogs} className="font-display text-lg text-[#f0d48a]" />
           <p className="text-xs text-silver">
             {builtCount}/{buildCap} built
           </p>
@@ -102,19 +102,11 @@ function GaragePage() {
 
       <button
         type="button"
-        onClick={() => addCogs(20)}
-        className="mt-3 min-h-10 rounded-md border border-border px-3 text-sm text-silver"
-      >
-        Test: add 20 Cogs
-      </button>
-
-      <button
-        type="button"
         disabled={cogs < BUILD_SLOT_COST}
         onClick={() => buyBuildSlot()}
-        className="mt-2 min-h-12 w-full rounded-md border border-[#f0d48a] font-display text-lg text-[#f0d48a] disabled:opacity-40"
+        className="mt-3 min-h-12 w-full rounded-md border border-[#f0d48a] font-display text-lg text-[#f0d48a] disabled:opacity-40"
       >
-        +1 car slot · {BUILD_SLOT_COST} Cogs
+        +1 car slot · <CogAmount amount={BUILD_SLOT_COST} />
       </button>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
@@ -308,7 +300,7 @@ function CarBuild({
         onClick={() => buySlots(car.make, car.model)}
         className="mt-3 min-h-12 w-full rounded-md border border-[#f0d48a] font-display text-lg text-[#f0d48a] disabled:opacity-40"
       >
-        +10 slots · {SLOT_PACK_COST} Cogs
+        +10 slots · <CogAmount amount={SLOT_PACK_COST} />
       </button>
 
       <section className="mt-6">
@@ -381,7 +373,7 @@ function CarBuild({
                 onClick={() => buyBuildSlot()}
                 className="mt-3 min-h-12 w-full rounded-md border border-[#f0d48a] font-display text-lg text-[#f0d48a] disabled:opacity-40"
               >
-                +1 car slot · {BUILD_SLOT_COST} Cogs
+                +1 car slot · <CogAmount amount={BUILD_SLOT_COST} />
               </button>
             )}
           </>

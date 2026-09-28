@@ -17,6 +17,7 @@ import { Route as GarageRouteImport } from './routes/garage'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as StoreRouteImport } from './routes/store'
 import { Route as TrophiesRouteImport } from './routes/trophies'
 import { Route as CollectionIndexRouteImport } from './routes/collection.index'
 import { Route as CollectionMakeRouteImport } from './routes/collection.$make'
@@ -63,6 +64,11 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoreRoute = StoreRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrophiesRoute = TrophiesRouteImport.update({
   id: '/trophies',
   path: '/trophies',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/history': typeof HistoryRouteWithChildren
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
+  '/store': typeof StoreRoute
   '/trophies': typeof TrophiesRoute
   '/collection/$make': typeof CollectionMakeRoute
   '/history/$id': typeof HistoryIdRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/garage': typeof GarageRoute
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
+  '/store': typeof StoreRoute
   '/trophies': typeof TrophiesRoute
   '/collection/$make': typeof CollectionMakeRoute
   '/history/$id': typeof HistoryIdRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/history': typeof HistoryRouteWithChildren
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
+  '/store': typeof StoreRoute
   '/trophies': typeof TrophiesRoute
   '/collection/$make': typeof CollectionMakeRoute
   '/history/$id': typeof HistoryIdRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/scan'
     | '/settings'
+    | '/store'
     | '/trophies'
     | '/collection/$make'
     | '/history/$id'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/garage'
     | '/scan'
     | '/settings'
+    | '/store'
     | '/trophies'
     | '/collection/$make'
     | '/history/$id'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/scan'
     | '/settings'
+    | '/store'
     | '/trophies'
     | '/collection/$make'
     | '/history/$id'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   HistoryRoute: typeof HistoryRouteWithChildren
   ScanRoute: typeof ScanRoute
   SettingsRoute: typeof SettingsRoute
+  StoreRoute: typeof StoreRoute
   TrophiesRoute: typeof TrophiesRoute
 }
 
@@ -247,6 +260,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store': {
+      id: '/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof StoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/trophies': {
@@ -323,6 +343,7 @@ const rootRouteChildren: RootRouteChildren = {
   HistoryRoute: HistoryRouteWithChildren,
   ScanRoute: ScanRoute,
   SettingsRoute: SettingsRoute,
+  StoreRoute: StoreRoute,
   TrophiesRoute: TrophiesRoute,
 }
 export const routeTree = rootRouteImport

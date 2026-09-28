@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Lock, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
-import { RankPlate } from "@/components/rank-plate";
+import { CogAmount } from "@/components/cog-amount";
 import { RefillSheet } from "@/components/refill-sheet";
-import { REFILL_PRICE } from "@/lib/types";
+import { SCAN_RESET_COST } from "@/lib/shop";
 import { useGarageStore } from "@/lib/store";
-import { rankProgress, scanCap, xpFromSightings } from "@/lib/ranks";
+import { scanCap } from "@/lib/ranks";
 import { formatDuration, msUntilMidnight } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: ScanHub });
@@ -18,13 +18,13 @@ function ScanHub() {
   const remaining = Math.max(0, scanCap(sightings, garagePlus) - scansUsedToday);
   const cap = scanCap(sightings, garagePlus);
   const purchases = useGarageStore((s) => s.demoPurchases);
+  const cogs = useGarageStore((s) => s.cogs ?? 0);
   const [refillOpen, setRefillOpen] = useState(false);
   const [left, setLeft] = useState(msUntilMidnight());
   const locked = remaining <= 0;
   const ratio = remaining / cap;
   const circ = 2 * Math.PI * 54;
   const dash = circ * ratio;
-  const rank = rankProgress(xpFromSightings(sightings));
 
   useEffect(() => {
     const id = window.setInterval(() => setLeft(msUntilMidnight()), 30000);
@@ -33,14 +33,18 @@ function ScanHub() {
 
   return (
     <main className="flex min-h-full flex-1 flex-col bg-navy px-5 pt-5">
-      <header className="relative">
-        <Link to="/trophies" className="block pr-14">
-          <RankPlate rank={rank.rank} current roman={rank.roman} pips={rank.pips} />
+      <header className="flex items-center justify-between gap-3">
+        <Link
+          to="/store"
+          className="flex min-h-11 items-center gap-3 rounded-md border border-border bg-navy-2 px-4 font-display text-lg"
+        >
+          Store
+          <CogAmount amount={cogs} className="text-[#f0d48a]" />
         </Link>
         <Link
           to="/settings"
           aria-label="Settings"
-          className="absolute right-0 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-md border border-border bg-navy-2 text-silver"
+          className="flex size-11 items-center justify-center rounded-md border border-border bg-navy-2 text-silver"
         >
           <Settings className="size-5" />
         </Link>
@@ -89,7 +93,7 @@ function ScanHub() {
               onClick={() => setRefillOpen(true)}
               className="mt-4 min-h-12 rounded-md bg-silver px-5 font-display text-lg tracking-wide text-navy"
             >
-              Refill {cap} scans — {REFILL_PRICE}
+              Reset scans · <CogAmount amount={SCAN_RESET_COST} className="text-navy" iconClassName="text-navy" />
             </button>
           </>
         ) : null}

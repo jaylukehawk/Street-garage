@@ -7,6 +7,7 @@ import { buildSeedSightings, countUsedToday } from "./seed";
 import { isDuplicateSighting } from "./geo";
 import { duplicateWindowMs, rankIndex, rankProgress, scanCap, xpFromSightings, type RankProgress } from "./ranks";
 import { localDayKey } from "./utils";
+import { COG_PACKS, SCAN_RESET_COST, type CogPackId } from "./shop";
 
 export type PipFillEvent = {
   from: RankProgress;
@@ -55,6 +56,8 @@ type GarageState = {
   addSighting: (input: Omit<Sighting, "id"> & { id?: string; favourite?: boolean }) => AddResult;
   toggleFavourite: (id: string) => void;
   refillScans: () => void;
+  resetScans: () => { ok: true } | { ok: false; reason: "cogs" | "full" };
+  buyCogPack: (id: CogPackId) => void;
   setGpsPreference: (value: GpsPreference) => void;
   clearPromotion: () => void;
   garagePlus: boolean;
@@ -244,6 +247,33 @@ export const useGarageStore = create<GarageState>()(
           scansUsedToday: 0,
           demoPurchases: [
             { at: new Date().toISOString(), note: "Demo purchase" },
+            ...get().demoPurchases,
+          ],
+        });
+      },
+      resetScans: () => {
+        const state = get();
+        state.ensureDay();
+        if (state.remainingScans() > 0) return { ok: false, reason: "full" };
+        if ((state.cogs ?? 0) < SCAN_RESET_COST) return { ok: false, reason: "cogs" };
+        set({
+          cogs: (state.cogs ?? 0) - SCAN_RESET_COST,
+          scanDay: localDayKey(),
+          scansUsedToday: 0,
+          demoPurchases: [
+            { at: new Date().toISOString(), note: `Reset scans · ${SCAN_RESET_COST}` },
+            ...state.demoPurchases,
+          ],
+        });
+        return { ok: true };
+      },
+      buyCogPack: (id) => {
+        const pack = COG_PACKS.find((row) => row.id === id);
+        if (!pack) return;
+        set({
+          cogs: (get().cogs ?? 0) + pack.amount,
+          demoPurchases: [
+            { at: new Date().toISOString(), note: `${pack.amount} pack · ${pack.price}` },
             ...get().demoPurchases,
           ],
         });
