@@ -19,6 +19,7 @@ import {
   type GaragePart,
   type PartRank,
 } from "@/lib/parts";
+import { computeBuildStats, STAT_KEYS, STAT_LABEL, type BuildStats } from "@/lib/stats";
 import { CogAmount } from "@/components/cog-amount";
 import { FLAG_DECALS, FLAG_RARE_DECALS, STREET_DECALS } from "@/lib/street-decals";
 import { BUILD_SLOT_COST, SLOT_PACK_COST, modelKey, useGarageStore } from "@/lib/store";
@@ -173,7 +174,9 @@ function CarList({
 
   return (
     <div className="mt-6 space-y-3">
-      {cars.map((car) => (
+      {cars.map((car) => {
+        const sheet = computeBuildStats(car.make, car.model, car.classId, car.rows);
+        return (
         <button
           key={car.key}
           type="button"
@@ -200,6 +203,7 @@ function CarList({
             <span className="block font-display text-xl leading-tight">{car.make}</span>
             <span className="text-sm text-silver">
               {car.model} · {BUILD_LABEL[car.classId]}
+              {car.unlocked === 6 ? ` · ${sheet.rank} ${sheet.rating}` : ""}
             </span>
           </span>
           <span className="text-right">
@@ -209,7 +213,8 @@ function CarList({
             </span>
           </span>
         </button>
-      ))}
+      );
+      })}
     </div>
   );
 }
@@ -235,6 +240,7 @@ function BuildList({
     <div className="mt-6 space-y-3">
       {cars.map((car) => {
         const saved = builds[car.key];
+        const sheet = computeBuildStats(car.make, car.model, car.classId, car.rows);
         return (
           <button
             key={car.key}
@@ -256,7 +262,7 @@ function BuildList({
             <span className="block px-4 py-3">
               <span className="block font-display text-xl leading-tight">{car.make}</span>
               <span className="text-sm text-silver">
-                {car.model} · {saved ? "Built" : "Pick a shape"}
+                {car.model} · {sheet.rank} {sheet.rating} · {saved ? "Built" : "Pick a shape"}
               </span>
             </span>
           </button>
@@ -291,6 +297,7 @@ function CarBuild({
   const complete = car.unlocked === 6;
   const open = canBuild(car.make, car.model);
   const choices = designsFor(car.classId);
+  const sheet = computeBuildStats(car.make, car.model, car.classId, car.rows);
 
   return (
     <div className="mt-6">
@@ -300,8 +307,9 @@ function CarBuild({
       <h2 className="mt-2 font-display text-3xl leading-none">{car.make}</h2>
       <p className="text-silver">{car.model}</p>
       <p className="mt-1 text-sm text-muted">
-        {car.rows.length}/{car.cap} parts · {car.unlocked} of 6 slots unlocked · {BUILD_LABEL[car.classId]}
+        {car.rows.length}/{car.cap} parts · {car.unlocked} of 6 slots unlocked · {BUILD_LABEL[car.classId]} · {sheet.chassis.band} {sheet.rank}
       </p>
+      <StatsCard sheet={sheet} />
       {full ? (
         <p className="mt-2 text-sm text-[#f0d48a]">Garage full. Delete a part or buy more slots.</p>
       ) : null}
@@ -553,6 +561,39 @@ function CarBuild({
         })}
       </div>
     </div>
+  );
+}
+
+function StatsCard({ sheet }: { sheet: BuildStats }) {
+  return (
+    <section className="mt-4 rounded-xl border border-border bg-navy-2 p-3">
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="font-display text-lg leading-none">Stats</p>
+          <p className="mt-1 text-xs text-silver">
+            {sheet.chassis.band} chassis · parts add up to +20. A Focus cannot outrun a Huracán.
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="font-display text-3xl leading-none text-[#f0d48a]">{sheet.rank}</p>
+          <p className="text-xs text-silver">{sheet.rating} rating</p>
+        </div>
+      </div>
+      <div className="mt-3 space-y-2">
+        {STAT_KEYS.map((key) => (
+          <div key={key} className="grid grid-cols-[4.5rem_1fr_2rem] items-center gap-2">
+            <span className="text-xs uppercase tracking-wide text-silver">{STAT_LABEL[key]}</span>
+            <span className="h-2 overflow-hidden rounded-full bg-navy">
+              <span
+                className="block h-full rounded-full bg-[#f0d48a]"
+                style={{ width: `${sheet.stats[key]}%` }}
+              />
+            </span>
+            <span className="text-right font-display text-sm text-[#f0d48a]">{sheet.stats[key]}</span>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
