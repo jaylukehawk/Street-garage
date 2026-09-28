@@ -13,8 +13,16 @@ export type PipFillEvent = {
 };
 
 type AddResult =
-  | { ok: true; sighting: Sighting; xpGained: number; promotedTo: string | null }
+  | { ok: true; sighting: Sighting; xpGained: number; promotedTo: string | null; partDropped: boolean }
   | { ok: false; reason: "limit" | "duplicate" };
+
+export const BASE_PART_CAP = 10;
+export const SLOT_PACK = 10;
+export const SLOT_PACK_COST = 20;
+
+export function modelKey(make: string, model: string) {
+  return `${make}|||${model}`;
+}
 
 type GarageState = {
   version: number;
@@ -41,7 +49,13 @@ type GarageState = {
   clearPromotion: () => void;
   garagePlus: boolean;
   parts: GaragePart[];
+  cogs: number;
+  slotBoosts: Record<string, number>;
   setGaragePlus: (on: boolean) => void;
+  deletePart: (id: string) => void;
+  partCap: (make: string, model: string) => number;
+  buySlots: (make: string, model: string) => { ok: true } | { ok: false; reason: "cogs" };
+  addCogs: (amount: number) => void;
 };
 
 export const useGarageStore = create<GarageState>()(
@@ -53,7 +67,11 @@ export const useGarageStore = create<GarageState>()(
       onboarded: false,
       sightings: [],
       scanDay: localDayKey(),
-      scansUsedToday: 0,       garagePlus: false,      parts: [],
+      scansUsedToday: 0,
+      garagePlus: false,
+      parts: [],
+      cogs: 0,
+      slotBoosts: {},
       setGaragePlus: (on) => set({ garagePlus: on }),
       demoPurchases: [],
       gpsPreference: "unknown",
@@ -79,8 +97,23 @@ export const useGarageStore = create<GarageState>()(
         set({ scanDay: today, scansUsedToday: 0 });
       },
       completeOnboarding: () => set({ onboarded: true }),
-            remainingScans: () =>
+      remainingScans: () =>
         Math.max(0, scanCap(get().sightings, get().garagePlus) - get().scansUsedToday),
+      partCap: (make, model) =>
+        BASE_PART_CAP + (get().slotBoosts?.[modelKey(make, model)] ?? 0),
+      deletePart: (id) =>
+        set({ parts: (get().parts ?? []).filter((part) => part.id !== id) }),
+      addCogs: (amount) => set({ cogs: Math.max(0, (get().cogs ?? 0) + amount) }),
+      buySlots: (make, model) => {
+        if ((get().cogs ?? 0) < SLOT_PACK_COST) return { ok: false, reason: "cogs" };
+        const key = modelKey(make, model);
+        const boosts = get().slotBoosts ?? {};
+        set({
+          cogs: (get().cogs ?? 0) - SLOT_PACK_COST,
+          slotBoosts: { ...boosts, [key]: (boosts[key] ?? 0) + SLOT_PACK },
+        });
+        return { ok: true };
+      },
       addSighting: (input) => {
         const state = get();
         state.ensureDay();
@@ -112,9 +145,17 @@ export const useGarageStore = create<GarageState>()(
         const promotedTo = afterRank.title !== beforeRank.title ? afterRank.title : null;
         const pipFilled =
           afterRank.pips > beforeRank.pips || afterRank.rank.id !== beforeRank.rank.id;
+        const key = modelKey(sighting.make, sighting.model);
+        const owned = (state.parts ?? []).filter(
+          (part) => modelKey(part.make, part.model) === key,
+        ).length;
+        const cap = BASE_PART_CAP + (state.slotBoosts?.[key] ?? 0);
+        const partDropped = owned < cap;
         set({
           sightings: nextSightings,
-          parts: [...(state.parts ?? []), rollPart(sighting.make, sighting.model, sighting.id)],
+          parts: partDropped
+            ? [...(state.parts ?? []), rollPart(sighting.make, sighting.model, sighting.id)]
+            : (state.parts ?? []),
           scansUsedToday: state.scansUsedToday + 1,
           pendingPromotion: promotedTo,
           pendingPipFill: pipFilled || promotedTo ? { from: beforeRank, to: afterRank } : null,
@@ -122,7 +163,7 @@ export const useGarageStore = create<GarageState>()(
             ? [sighting.id, ...(state.favouriteIds ?? []).filter((id) => id !== sighting.id)]
             : (state.favouriteIds ?? []),
         });
-        return { ok: true, sighting, xpGained, promotedTo };
+        return { ok: true, sighting, xpGained, promotedTo, partDropped };
       },
       toggleFavourite: (id) => {
         const state = get();
@@ -160,14 +201,20 @@ export const useGarageStore = create<GarageState>()(
         scansUsedToday: state.scansUsedToday,
         demoPurchases: state.demoPurchases,
         gpsPreference: state.gpsPreference,
-        favouriteIds: state.favouriteIds ?? [], parts: state.parts ?? [],
+        favouriteIds: state.favouriteIds ?? [],
+        parts: state.parts ?? [],
+        cogs: state.cogs ?? 0,
+        slotBoosts: state.slotBoosts ?? {},
       }),
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<GarageState>;
         return {
           ...current,
           ...saved,
-          favouriteIds: Array.isArray(saved.favouriteIds) ? saved.favouriteIds : [],         parts: Array.isArray(saved.parts) ? saved.parts : [],
+          favouriteIds: Array.isArray(saved.favouriteIds) ? saved.favouriteIds : [],
+          parts: Array.isArray(saved.parts) ? saved.parts : [],
+          cogs: typeof saved.cogs === "number" ? saved.cogs : 0,
+          slotBoosts: saved.slotBoosts ?? {},
         };
       },
     },
