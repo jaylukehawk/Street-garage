@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { SAVE_VERSION, type DemoPurchase, type GpsPreference, type Sighting } from "./types";
 import { rollPart, type GaragePart } from "./parts";
+import type { SavedBuild, VinylId } from "./builds";
 import { buildSeedSightings, countUsedToday } from "./seed";
 import { isDuplicateSighting } from "./geo";
 import { duplicateWindowMs, rankIndex, rankProgress, scanCap, xpFromSightings, type RankProgress } from "./ranks";
@@ -13,7 +14,14 @@ export type PipFillEvent = {
 };
 
 type AddResult =
-  | { ok: true; sighting: Sighting; xpGained: number; promotedTo: string | null; partDropped: boolean }
+  | {
+      ok: true;
+      sighting: Sighting;
+      xpGained: number;
+      promotedTo: string | null;
+      partDropped: boolean;
+      part: GaragePart | null;
+    }
   | { ok: false; reason: "limit" | "duplicate" };
 
 export const BASE_PART_CAP = 10;
@@ -51,7 +59,9 @@ type GarageState = {
   parts: GaragePart[];
   cogs: number;
   slotBoosts: Record<string, number>;
+  builds: Record<string, SavedBuild>;
   setGaragePlus: (on: boolean) => void;
+  setBuild: (make: string, model: string, design: string, vinyl?: VinylId) => void;
   deletePart: (id: string) => void;
   partCap: (make: string, model: string) => number;
   buySlots: (make: string, model: string) => { ok: true } | { ok: false; reason: "cogs" };
@@ -72,7 +82,18 @@ export const useGarageStore = create<GarageState>()(
       parts: [],
       cogs: 0,
       slotBoosts: {},
+      builds: {},
       setGaragePlus: (on) => set({ garagePlus: on }),
+      setBuild: (make, model, design, vinyl) => {
+        const key = modelKey(make, model);
+        const current = get().builds?.[key];
+        set({
+          builds: {
+            ...(get().builds ?? {}),
+            [key]: { design, vinyl: vinyl ?? current?.vinyl ?? "none" },
+          },
+        });
+      },
       demoPurchases: [],
       gpsPreference: "unknown",
       pendingPromotion: null,
@@ -151,11 +172,12 @@ export const useGarageStore = create<GarageState>()(
         ).length;
         const cap = BASE_PART_CAP + (state.slotBoosts?.[key] ?? 0);
         const partDropped = owned < cap;
+        const part = partDropped
+          ? rollPart(sighting.make, sighting.model, sighting.id)
+          : null;
         set({
           sightings: nextSightings,
-          parts: partDropped
-            ? [...(state.parts ?? []), rollPart(sighting.make, sighting.model, sighting.id)]
-            : (state.parts ?? []),
+          parts: part ? [...(state.parts ?? []), part] : (state.parts ?? []),
           scansUsedToday: state.scansUsedToday + 1,
           pendingPromotion: promotedTo,
           pendingPipFill: pipFilled || promotedTo ? { from: beforeRank, to: afterRank } : null,
@@ -163,7 +185,7 @@ export const useGarageStore = create<GarageState>()(
             ? [sighting.id, ...(state.favouriteIds ?? []).filter((id) => id !== sighting.id)]
             : (state.favouriteIds ?? []),
         });
-        return { ok: true, sighting, xpGained, promotedTo, partDropped };
+        return { ok: true, sighting, xpGained, promotedTo, partDropped, part };
       },
       toggleFavourite: (id) => {
         const state = get();
@@ -205,6 +227,7 @@ export const useGarageStore = create<GarageState>()(
         parts: state.parts ?? [],
         cogs: state.cogs ?? 0,
         slotBoosts: state.slotBoosts ?? {},
+        builds: state.builds ?? {},
       }),
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<GarageState>;
@@ -215,6 +238,7 @@ export const useGarageStore = create<GarageState>()(
           parts: Array.isArray(saved.parts) ? saved.parts : [],
           cogs: typeof saved.cogs === "number" ? saved.cogs : 0,
           slotBoosts: saved.slotBoosts ?? {},
+          builds: saved.builds ?? {},
         };
       },
     },

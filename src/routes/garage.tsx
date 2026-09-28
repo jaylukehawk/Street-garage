@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
+  BUILD_LABEL,
+  VINYLS,
+  buildClassFor,
+  designSrc,
+  designsFor,
+  type BuildClassId,
+  type VinylId,
+} from "@/lib/builds";
+import {
   PART_SLOTS,
   SLOT_LABEL,
   type GaragePart,
@@ -24,12 +33,25 @@ function worstPart(rows: GaragePart[]) {
   );
 }
 
+type GarageCar = {
+  key: string;
+  make: string;
+  model: string;
+  rows: GaragePart[];
+  unlocked: number;
+  cap: number;
+  year: number | null;
+  classId: BuildClassId;
+};
+
 function GaragePage() {
   const parts = useGarageStore((s) => s.parts ?? []);
+  const sightings = useGarageStore((s) => s.sightings);
   const cogs = useGarageStore((s) => s.cogs ?? 0);
   const addCogs = useGarageStore((s) => s.addCogs);
   const partCap = useGarageStore((s) => s.partCap);
-  const [tab, setTab] = useState<"builds" | "parts">("builds");
+  const builds = useGarageStore((s) => s.builds ?? {});
+  const [tab, setTab] = useState<"cars" | "builds" | "parts">("cars");
   const [openKey, setOpenKey] = useState<string | null>(null);
 
   const cars = useMemo(() => {
@@ -41,18 +63,24 @@ function GaragePage() {
       map.set(key, rows);
     }
     return [...map.entries()]
-      .map(([key, rows]) => ({
-        key,
-        make: rows[0]!.make,
-        model: rows[0]!.model,
-        rows,
-        unlocked: new Set(rows.map((p) => p.slot)).size,
-        cap: partCap(rows[0]!.make, rows[0]!.model),
-      }))
+      .map(([key, rows]) => {
+        const year = sightings.find((s) => modelKey(s.make, s.model) === key)?.year ?? null;
+        return {
+          key,
+          make: rows[0]!.make,
+          model: rows[0]!.model,
+          rows,
+          unlocked: new Set(rows.map((p) => p.slot)).size,
+          cap: partCap(rows[0]!.make, rows[0]!.model),
+          year,
+          classId: buildClassFor(rows[0]!.make, rows[0]!.model, year),
+        };
+      })
       .sort((a, b) => b.unlocked - a.unlocked || a.make.localeCompare(b.make));
-  }, [parts, partCap]);
+  }, [parts, partCap, sightings]);
 
   const openCar = cars.find((car) => car.key === openKey) ?? null;
+  const ready = cars.filter((car) => car.unlocked === 6);
 
   return (
     <main className="px-5 pt-6 pb-8">
@@ -72,28 +100,28 @@ function GaragePage() {
         Test: add 20 Cogs
       </button>
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            setTab("builds");
-            setOpenKey(null);
-          }}
-          className={`min-h-12 rounded-md font-display text-lg ${
-            tab === "builds" ? "bg-primary text-primary-fg" : "border border-border"
-          }`}
-        >
-          Cars
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("parts")}
-          className={`min-h-12 rounded-md font-display text-lg ${
-            tab === "parts" ? "bg-primary text-primary-fg" : "border border-border"
-          }`}
-        >
-          Parts {parts.length}
-        </button>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        {(
+          [
+            ["cars", "Cars"],
+            ["builds", `Builds ${ready.length}`],
+            ["parts", `Parts ${parts.length}`],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => {
+              setTab(id);
+              setOpenKey(null);
+            }}
+            className={`min-h-12 rounded-md font-display text-base ${
+              tab === id ? "bg-primary text-primary-fg" : "border border-border"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <Link
@@ -106,9 +134,11 @@ function GaragePage() {
       {tab === "parts" ? (
         <PartsList parts={parts} />
       ) : openCar ? (
-        <CarBuild car={openCar} onBack={() => setOpenKey(null)} />
+        <CarBuild car={openCar} build={builds[openCar.key]} onBack={() => setOpenKey(null)} />
+      ) : tab === "builds" ? (
+        <BuildList cars={ready} builds={builds} onOpen={setOpenKey} />
       ) : (
-        <CarList cars={cars} onOpen={setOpenKey} />
+        <CarList cars={cars} builds={builds} onOpen={setOpenKey} />
       )}
     </main>
   );
@@ -116,16 +146,11 @@ function GaragePage() {
 
 function CarList({
   cars,
+  builds,
   onOpen,
 }: {
-  cars: {
-    key: string;
-    make: string;
-    model: string;
-    rows: GaragePart[];
-    unlocked: number;
-    cap: number;
-  }[];
+  cars: GarageCar[];
+  builds: Record<string, { design: string }>;
   onOpen: (key: string) => void;
 }) {
   if (cars.length === 0) {
@@ -139,15 +164,32 @@ function CarList({
           key={car.key}
           type="button"
           onClick={() => onOpen(car.key)}
-          className="flex w-full items-center justify-between rounded-xl border border-border bg-navy-2 px-4 py-3 text-left"
+          className="flex w-full items-center gap-3 rounded-xl border border-border bg-navy-2 px-4 py-3 text-left"
         >
-          <span>
+          {builds[car.key] ? (
+            <img
+              src={designSrc(builds[car.key]!.design)}
+              alt=""
+              className="h-14 w-20 rounded-md object-cover"
+            />
+          ) : (
+            <img
+              src={`/badges/${car.classId}.jpg`}
+              alt=""
+              className="size-12 rounded-full object-cover"
+            />
+          )}
+          <span className="min-w-0 flex-1">
             <span className="block font-display text-xl leading-tight">{car.make}</span>
-            <span className="text-sm text-silver">{car.model}</span>
+            <span className="text-sm text-silver">
+              {car.model} · {BUILD_LABEL[car.classId]}
+            </span>
           </span>
           <span className="text-right">
             <span className="block font-display text-lg">{car.rows.length}/{car.cap}</span>
-            <span className="text-xs text-silver">{car.unlocked}/6 slots</span>
+            <span className="text-xs text-silver">
+              {car.unlocked === 6 ? "Ready" : `${car.unlocked}/6 slots`}
+            </span>
           </span>
         </button>
       ))}
@@ -155,17 +197,73 @@ function CarList({
   );
 }
 
+function BuildList({
+  cars,
+  builds,
+  onOpen,
+}: {
+  cars: GarageCar[];
+  builds: Record<string, { design: string; vinyl: VinylId }>;
+  onOpen: (key: string) => void;
+}) {
+  if (cars.length === 0) {
+    return (
+      <p className="mt-8 text-sm text-muted">
+        Fill all 6 slots on a model to unlock a build. The shape is a workshop stand-in, not the real car.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-6 space-y-3">
+      {cars.map((car) => {
+        const saved = builds[car.key];
+        return (
+          <button
+            key={car.key}
+            type="button"
+            onClick={() => onOpen(car.key)}
+            className="w-full overflow-hidden rounded-xl border border-border bg-navy-2 text-left"
+          >
+            {saved ? (
+              <div className="relative">
+                <img src={designSrc(saved.design)} alt="" className="h-40 w-full object-cover" />
+                <Vinyl id={saved.vinyl} />
+              </div>
+            ) : (
+              <div className="flex h-24 items-center justify-center text-sm text-silver">
+                Ready to build · {BUILD_LABEL[car.classId]}
+              </div>
+            )}
+            <span className="block px-4 py-3">
+              <span className="block font-display text-xl leading-tight">{car.make}</span>
+              <span className="text-sm text-silver">
+                {car.model} · {saved ? "Built" : "Pick a shape"}
+              </span>
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function CarBuild({
   car,
+  build,
   onBack,
 }: {
-  car: { make: string; model: string; rows: GaragePart[]; unlocked: number; cap: number };
+  car: GarageCar;
+  build?: { design: string; vinyl: VinylId };
   onBack: () => void;
 }) {
   const cogs = useGarageStore((s) => s.cogs ?? 0);
   const buySlots = useGarageStore((s) => s.buySlots);
   const deletePart = useGarageStore((s) => s.deletePart);
+  const setBuild = useGarageStore((s) => s.setBuild);
   const full = car.rows.length >= car.cap;
+  const complete = car.unlocked === 6;
+  const choices = designsFor(car.classId);
 
   return (
     <div className="mt-6">
@@ -175,7 +273,7 @@ function CarBuild({
       <h2 className="mt-2 font-display text-3xl leading-none">{car.make}</h2>
       <p className="text-silver">{car.model}</p>
       <p className="mt-1 text-sm text-muted">
-        {car.rows.length}/{car.cap} parts · {car.unlocked} of 6 slots unlocked
+        {car.rows.length}/{car.cap} parts · {car.unlocked} of 6 slots unlocked · {BUILD_LABEL[car.classId]}
       </p>
       {full ? (
         <p className="mt-2 text-sm text-[#f0d48a]">Garage full. Delete a part or buy more slots.</p>
@@ -189,6 +287,56 @@ function CarBuild({
       >
         +10 slots · {SLOT_PACK_COST} Cogs
       </button>
+
+      <section className="mt-6">
+        <h3 className="font-display text-xl">Build</h3>
+        {complete ? (
+          <>
+            {build ? (
+              <div className="relative mt-3 overflow-hidden rounded-xl border border-border">
+                <img src={designSrc(build.design)} alt="" className="h-48 w-full object-cover" />
+                <Vinyl id={build.vinyl} />
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-muted">
+                All 6 slots are filled. Pick a workshop shape. These are not the real car.
+              </p>
+            )}
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {choices.map((choice, index) => (
+                <button
+                  key={choice.id}
+                  type="button"
+                  onClick={() => setBuild(car.make, car.model, choice.id, build?.vinyl)}
+                  className={`overflow-hidden rounded-lg border ${
+                    build?.design === choice.id ? "border-[#f0d48a]" : "border-border"
+                  }`}
+                >
+                  <img src={choice.src} alt="" className="h-16 w-full object-cover" />
+                  <span className="block py-1 text-center text-xs text-silver">{index + 1}</span>
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {VINYLS.map((vinyl) => (
+                <button
+                  key={vinyl.id}
+                  type="button"
+                  disabled={!build}
+                  onClick={() => build && setBuild(car.make, car.model, build.design, vinyl.id)}
+                  className={`min-h-10 rounded-md border text-xs ${
+                    build?.vinyl === vinyl.id ? "border-[#f0d48a] text-[#f0d48a]" : "border-border text-silver"
+                  } disabled:opacity-40`}
+                >
+                  {vinyl.label}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="mt-2 text-sm text-muted">Unlock all 6 slots to build this model.</p>
+        )}
+      </section>
 
       <div className="mt-4 space-y-3">
         {PART_SLOTS.map((slot) => {
@@ -240,6 +388,19 @@ function CarBuild({
       </div>
     </div>
   );
+}
+
+function Vinyl({ id }: { id: VinylId }) {
+  if (id === "stripe") {
+    return <div className="pointer-events-none absolute inset-y-0 left-1/2 w-8 -translate-x-1/2 bg-white/40" />;
+  }
+  if (id === "gold") {
+    return <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-[#f0d48a]/30 to-transparent" />;
+  }
+  if (id === "ghost") {
+    return <div className="pointer-events-none absolute inset-x-4 bottom-4 h-8 rounded-full bg-white/25" />;
+  }
+  return null;
 }
 
 function rankTone(rank: GaragePart["rank"]) {

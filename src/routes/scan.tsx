@@ -10,6 +10,7 @@ import { reverseGeocode } from "@/lib/geocode";
 import { identifyVehicle } from "@/lib/identify";
 import { prepareScanPhoto, resizeToJpeg } from "@/lib/image";
 import { requestPosition } from "@/lib/geo";
+import { SLOT_LABEL } from "@/lib/parts";
 import { useGarageStore } from "@/lib/store";
 import { scanCap } from "@/lib/ranks";
 import { REFILL_PRICE, type IdentifyResult } from "@/lib/types";
@@ -192,7 +193,11 @@ function ScanPage() {
         setRefillOpen(true);
         return;
       }
-      toast(`Logged · ${make} ${model} · +${result.xpGained} XP`);
+      toast(
+        result.part
+          ? `Logged · ${make} ${model} · +${result.xpGained} XP · ${result.part.rank} ${SLOT_LABEL[result.part.slot]}`
+          : `Logged · ${make} ${model} · +${result.xpGained} XP · garage full`,
+      );
       navigate({ to: "/history/$id", params: { id: result.sighting.id } });
     } finally {
       setBusy(false);

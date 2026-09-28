@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CollectionRouteImport } from './routes/collection'
 import { Route as FavouritesRouteImport } from './routes/favourites'
+import { Route as FriendsRouteImport } from './routes/friends'
+import { Route as GarageRouteImport } from './routes/garage'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -34,6 +36,16 @@ const CollectionRoute = CollectionRouteImport.update({
 const FavouritesRoute = FavouritesRouteImport.update({
   id: '/favourites',
   path: '/favourites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FriendsRoute = FriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GarageRoute = GarageRouteImport.update({
+  id: '/garage',
+  path: '/garage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -81,6 +93,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/collection': typeof CollectionRouteWithChildren
   '/favourites': typeof FavouritesRoute
+  '/friends': typeof FriendsRoute
+  '/garage': typeof GarageRoute
   '/history': typeof HistoryRouteWithChildren
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
@@ -93,6 +107,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/favourites': typeof FavouritesRoute
+  '/friends': typeof FriendsRoute
+  '/garage': typeof GarageRoute
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/trophies': typeof TrophiesRoute
@@ -106,6 +122,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/collection': typeof CollectionRouteWithChildren
   '/favourites': typeof FavouritesRoute
+  '/friends': typeof FriendsRoute
+  '/garage': typeof GarageRoute
   '/history': typeof HistoryRouteWithChildren
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
@@ -121,6 +139,8 @@ export interface FileRouteTypes {
     | '/'
     | '/collection'
     | '/favourites'
+    | '/friends'
+    | '/garage'
     | '/history'
     | '/scan'
     | '/settings'
@@ -133,6 +153,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/favourites'
+    | '/friends'
+    | '/garage'
     | '/scan'
     | '/settings'
     | '/trophies'
@@ -145,6 +167,8 @@ export interface FileRouteTypes {
     | '/'
     | '/collection'
     | '/favourites'
+    | '/friends'
+    | '/garage'
     | '/history'
     | '/scan'
     | '/settings'
@@ -159,6 +183,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CollectionRoute: typeof CollectionRouteWithChildren
   FavouritesRoute: typeof FavouritesRoute
+  FriendsRoute: typeof FriendsRoute
+  GarageRoute: typeof GarageRoute
   HistoryRoute: typeof HistoryRouteWithChildren
   ScanRoute: typeof ScanRoute
   SettingsRoute: typeof SettingsRoute
@@ -186,6 +212,20 @@ declare module '@tanstack/react-router' {
       path: '/favourites'
       fullPath: '/favourites'
       preLoaderRoute: typeof FavouritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/friends': {
+      id: '/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof FriendsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/garage': {
+      id: '/garage'
+      path: '/garage'
+      fullPath: '/garage'
+      preLoaderRoute: typeof GarageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -278,6 +318,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CollectionRoute: CollectionRouteWithChildren,
   FavouritesRoute: FavouritesRoute,
+  FriendsRoute: FriendsRoute,
+  GarageRoute: GarageRoute,
   HistoryRoute: HistoryRouteWithChildren,
   ScanRoute: ScanRoute,
   SettingsRoute: SettingsRoute,

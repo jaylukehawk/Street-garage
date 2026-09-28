@@ -1,7 +1,7 @@
-import { bodyFor } from "./catalog";
+import { bodyFor, getMake } from "./catalog";
 import type { Sighting } from "./types";
 
-export type SpecialId = "suv" | "electric" | "vintage" | "supercar" | "fourbyfour" | "van";
+export type SpecialId = "suv" | "electric" | "vintage" | "supercar" | "fourbyfour" | "van" | "hatchback";
 
 export const SPECIALS: { id: SpecialId; label: string }[] = [
   { id: "suv", label: "SUV" },
@@ -10,6 +10,7 @@ export const SPECIALS: { id: SpecialId; label: string }[] = [
   { id: "supercar", label: "Supercar" },
   { id: "fourbyfour", label: "4x4" },
   { id: "van", label: "Van" },
+  { id: "hatchback", label: "Hatchback" },
 ];
 
 const EV = [
@@ -39,6 +40,12 @@ function hay(s: Sighting) {
   return `${s.make} ${s.model}`.toLowerCase();
 }
 
+function knownBody(s: Sighting) {
+  const entry = getMake(s.make);
+  if (!entry) return null;
+  return entry.bodies[s.model] ?? null;
+}
+
 export function matchesSpecial(s: Sighting, id: SpecialId) {
   const text = hay(s);
   const body = bodyFor(s.make, s.model);
@@ -48,6 +55,10 @@ export function matchesSpecial(s: Sighting, id: SpecialId) {
   if (id === "supercar") return SUPER.some((n) => text.includes(n));
   if (id === "fourbyfour") return body === "pickup" || FOURBY.some((n) => text.includes(n));
   if (id === "van") return VANS.some((n) => text.includes(n));
+  if (id === "hatchback") {
+    const body = knownBody(s);
+    return body === "hatch" || body === "mini";
+  }
   return false;
 }
 
