@@ -32,10 +32,22 @@ export const VINYLS = [
 
 export type VinylId = (typeof VINYLS)[number]["id"];
 
+export const DECALS = [
+  { id: "none", label: "None" },
+] as const;
+
+export type DecalId = string;
+
 export type SavedBuild = {
   design: string;
   vinyl: VinylId;
+  decal: DecalId;
 };
+
+export function decalSrc(id: DecalId) {
+  if (!id || id === "none") return null;
+  return `/decals/${id}.png`;
+}
 
 export function designSrc(designId: string) {
   return `/builds/${designId}.jpg`;

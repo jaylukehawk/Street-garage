@@ -1,12 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { Sticker } from "lucide-react";
 import {
   BUILD_LABEL,
+  DECALS,
   VINYLS,
   buildClassFor,
+  decalSrc,
   designSrc,
   designsFor,
   type BuildClassId,
+  type DecalId,
   type VinylId,
 } from "@/lib/builds";
 import {
@@ -159,7 +163,7 @@ function CarList({
   onOpen,
 }: {
   cars: GarageCar[];
-  builds: Record<string, { design: string }>;
+  builds: Record<string, { design: string; vinyl?: VinylId; decal?: DecalId }>;
   onOpen: (key: string) => void;
 }) {
   if (cars.length === 0) {
@@ -176,11 +180,14 @@ function CarList({
           className="flex w-full items-center gap-3 rounded-xl border border-border bg-navy-2 px-4 py-3 text-left"
         >
           {builds[car.key] ? (
-            <img
-              src={designSrc(builds[car.key]!.design)}
-              alt=""
-              className="h-14 w-20 rounded-md object-cover"
-            />
+            <span className="relative h-14 w-20 overflow-hidden rounded-md">
+              <img
+                src={designSrc(builds[car.key]!.design)}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+              <DecalMark id={builds[car.key]!.decal ?? "none"} />
+            </span>
           ) : (
             <img
               src={`/badges/${car.classId}.jpg`}
@@ -212,7 +219,7 @@ function BuildList({
   onOpen,
 }: {
   cars: GarageCar[];
-  builds: Record<string, { design: string; vinyl: VinylId }>;
+  builds: Record<string, { design: string; vinyl: VinylId; decal?: DecalId }>;
   onOpen: (key: string) => void;
 }) {
   if (cars.length === 0) {
@@ -238,6 +245,7 @@ function BuildList({
               <div className="relative">
                 <img src={designSrc(saved.design)} alt="" className="h-40 w-full object-cover" />
                 <Vinyl id={saved.vinyl} />
+                <DecalMark id={saved.decal ?? "none"} />
               </div>
             ) : (
               <div className="flex h-24 items-center justify-center text-sm text-silver">
@@ -263,14 +271,16 @@ function CarBuild({
   onBack,
 }: {
   car: GarageCar;
-  build?: { design: string; vinyl: VinylId };
+  build?: { design: string; vinyl: VinylId; decal?: DecalId };
   onBack: () => void;
 }) {
   const cogs = useGarageStore((s) => s.cogs ?? 0);
   const buySlots = useGarageStore((s) => s.buySlots);
   const deletePart = useGarageStore((s) => s.deletePart);
   const setBuild = useGarageStore((s) => s.setBuild);
+  const setDecal = useGarageStore((s) => s.setDecal);
   const clearBuild = useGarageStore((s) => s.clearBuild);
+  const [decalOpen, setDecalOpen] = useState(false);
   const canBuild = useGarageStore((s) => s.canBuild);
   const buyBuildSlot = useGarageStore((s) => s.buyBuildSlot);
   const builtCount = useGarageStore((s) => s.builtCount());
@@ -309,8 +319,17 @@ function CarBuild({
           <>
             {build ? (
               <div className="relative mt-3 overflow-hidden rounded-xl border border-border">
-                <img src={designSrc(build.design)} alt="" className="h-48 w-full object-cover" />
+                <img src={designSrc(build.design)} alt="" className="h-56 w-full object-cover" />
                 <Vinyl id={build.vinyl} />
+                <DecalMark id={build.decal ?? "none"} />
+                <button
+                  type="button"
+                  onClick={() => setDecalOpen((on) => !on)}
+                  className="absolute right-2 top-2 flex size-11 items-center justify-center rounded-full border border-[#f0d48a] bg-navy/80 text-[#f0d48a]"
+                  aria-label="Decals"
+                >
+                  <Sticker className="size-5" />
+                </button>
               </div>
             ) : open ? (
               <p className="mt-2 text-sm text-muted">
@@ -353,6 +372,30 @@ function CarBuild({
                     </button>
                   ))}
                 </div>
+                {decalOpen && build ? (
+                  <div className="mt-3 rounded-xl border border-border bg-navy-2 p-3">
+                    <p className="font-display text-lg">Decals</p>
+                    <p className="mt-1 text-sm text-muted">
+                      Stickers sit on the finished car. Drop new art in public/decals and add them to the list.
+                    </p>
+                    <div className="mt-3 grid grid-cols-4 gap-2">
+                      {DECALS.map((decal) => (
+                        <button
+                          key={decal.id}
+                          type="button"
+                          onClick={() => setDecal(car.make, car.model, decal.id)}
+                          className={`min-h-10 rounded-md border text-xs ${
+                            (build.decal ?? "none") === decal.id
+                              ? "border-[#f0d48a] text-[#f0d48a]"
+                              : "border-border text-silver"
+                          }`}
+                        >
+                          {decal.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
                 {build ? (
                   <button
                     type="button"
@@ -431,6 +474,18 @@ function CarBuild({
         })}
       </div>
     </div>
+  );
+}
+
+function DecalMark({ id }: { id: DecalId }) {
+  const src = decalSrc(id);
+  if (!src) return null;
+  return (
+    <img
+      src={src}
+      alt=""
+      className="pointer-events-none absolute right-10 bottom-6 h-12 w-12 object-contain drop-shadow"
+    />
   );
 }
 

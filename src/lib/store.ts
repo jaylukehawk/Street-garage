@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { SAVE_VERSION, type DemoPurchase, type GpsPreference, type Sighting } from "./types";
 import { rollPart, type GaragePart } from "./parts";
-import type { SavedBuild, VinylId } from "./builds";
+import type { DecalId, SavedBuild, VinylId } from "./builds";
 import { buildSeedSightings, countUsedToday } from "./seed";
 import { isDuplicateSighting } from "./geo";
 import { duplicateWindowMs, rankIndex, rankProgress, scanCap, xpFromSightings, type RankProgress } from "./ranks";
@@ -73,6 +73,7 @@ type GarageState = {
     design: string,
     vinyl?: VinylId,
   ) => { ok: true } | { ok: false; reason: "slots" };
+  setDecal: (make: string, model: string, decal: DecalId) => void;
   clearBuild: (make: string, model: string) => void;
   deletePart: (id: string) => void;
   partCap: (make: string, model: string) => number;
@@ -118,10 +119,25 @@ export const useGarageStore = create<GarageState>()(
         set({
           builds: {
             ...builds,
-            [key]: { design, vinyl: vinyl ?? current?.vinyl ?? "none" },
+            [key]: {
+              design,
+              vinyl: vinyl ?? current?.vinyl ?? "none",
+              decal: current?.decal ?? "none",
+            },
           },
         });
         return { ok: true };
+      },
+      setDecal: (make, model, decal) => {
+        const key = modelKey(make, model);
+        const current = (get().builds ?? {})[key];
+        if (!current) return;
+        set({
+          builds: {
+            ...(get().builds ?? {}),
+            [key]: { ...current, decal },
+          },
+        });
       },
       clearBuild: (make, model) => {
         const key = modelKey(make, model);
@@ -309,7 +325,16 @@ export const useGarageStore = create<GarageState>()(
           parts: Array.isArray(saved.parts) ? saved.parts : [],
           cogs: typeof saved.cogs === "number" ? saved.cogs : 0,
           slotBoosts: saved.slotBoosts ?? {},
-          builds: saved.builds ?? {},
+          builds: Object.fromEntries(
+            Object.entries(saved.builds ?? {}).map(([key, row]) => [
+              key,
+              {
+                design: row.design,
+                vinyl: row.vinyl ?? "none",
+                decal: row.decal ?? "none",
+              },
+            ]),
+          ),
           extraBuildSlots: typeof saved.extraBuildSlots === "number" ? saved.extraBuildSlots : 0,
         };
       },
