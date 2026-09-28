@@ -570,9 +570,7 @@ function StatsCard({ sheet }: { sheet: BuildStats }) {
       <div className="flex items-end justify-between gap-3">
         <div>
           <p className="font-display text-lg leading-none">Stats</p>
-          <p className="mt-1 text-xs text-silver">
-            {sheet.chassis.band} chassis · parts add up to +20. A Focus cannot outrun a Huracán.
-          </p>
+          <p className="mt-1 text-xs text-silver">{sheet.chassis.band} chassis</p>
         </div>
         <div className="text-right">
           <p className="font-display text-3xl leading-none text-[#f0d48a]">{sheet.rank}</p>

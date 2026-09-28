@@ -17,7 +17,6 @@ function ScanHub() {
   const garagePlus = useGarageStore((s) => s.garagePlus);
   const remaining = Math.max(0, scanCap(sightings, garagePlus) - scansUsedToday);
   const cap = scanCap(sightings, garagePlus);
-  const purchases = useGarageStore((s) => s.demoPurchases);
   const cogs = useGarageStore((s) => s.cogs ?? 0);
   const [refillOpen, setRefillOpen] = useState(false);
   const [left, setLeft] = useState(msUntilMidnight());
@@ -96,9 +95,6 @@ function ScanHub() {
               Reset scans · <CogAmount amount={SCAN_RESET_COST} className="text-navy" iconClassName="text-navy" />
             </button>
           </>
-        ) : null}
-        {purchases[0] ? (
-          <p className="mt-2 text-xs text-muted">{purchases[0].note} · restored scans</p>
         ) : null}
       </div>
       <RefillSheet open={refillOpen} onOpenChange={setRefillOpen} />
