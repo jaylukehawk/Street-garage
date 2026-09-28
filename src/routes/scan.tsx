@@ -4,13 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BookmarkButton } from "@/components/bookmark-button";
+import { PartDrop } from "@/components/part-drop";
 import { RefillSheet } from "@/components/refill-sheet";
 import { COLOURS, DEFAULT_MAKE, MAKE_NAMES, modelsFor, nearestMake } from "@/lib/catalog";
 import { reverseGeocode } from "@/lib/geocode";
 import { identifyVehicle } from "@/lib/identify";
 import { prepareScanPhoto, resizeToJpeg } from "@/lib/image";
 import { requestPosition } from "@/lib/geo";
-import { SLOT_LABEL } from "@/lib/parts";
+import type { GaragePart } from "@/lib/parts";
 import { useGarageStore } from "@/lib/store";
 import { scanCap } from "@/lib/ranks";
 import { REFILL_PRICE, type IdentifyResult } from "@/lib/types";
@@ -32,6 +33,8 @@ function ScanPage() {
   const addSighting = useGarageStore((s) => s.addSighting);
   const setGps = useGarageStore((s) => s.setGpsPreference);
 
+  const [dropped, setDropped] = useState<GaragePart | null>(null);
+  const [afterDropId, setAfterDropId] = useState<string | null>(null);
   const [stage, setStage] = useState<Stage>("live");
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -193,12 +196,13 @@ function ScanPage() {
         setRefillOpen(true);
         return;
       }
-      toast(
-        result.part
-          ? `Logged · ${make} ${model} · +${result.xpGained} XP · ${result.part.rank} ${SLOT_LABEL[result.part.slot]}`
-          : `Logged · ${make} ${model} · +${result.xpGained} XP · garage full`,
-      );
-      navigate({ to: "/history/$id", params: { id: result.sighting.id } });
+      if (result.part) {
+        setDropped(result.part);
+        setAfterDropId(result.sighting.id);
+      } else {
+        toast(`Logged · ${make} ${model} · +${result.xpGained} XP · garage full`);
+        navigate({ to: "/history/$id", params: { id: result.sighting.id } });
+      }
     } finally {
       setBusy(false);
     }
@@ -422,6 +426,17 @@ function ScanPage() {
         }}
       />
       <RefillSheet open={refillOpen} onOpenChange={setRefillOpen} />
+      {dropped ? (
+        <PartDrop
+          part={dropped}
+          onDone={() => {
+            const id = afterDropId;
+            setDropped(null);
+            setAfterDropId(null);
+            if (id) navigate({ to: "/history/$id", params: { id } });
+          }}
+        />
+      ) : null}
     </main>
   );
 }
