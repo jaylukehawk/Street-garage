@@ -15,7 +15,7 @@ import {
   type GaragePart,
   type PartRank,
 } from "@/lib/parts";
-import { SLOT_PACK_COST, modelKey, useGarageStore } from "@/lib/store";
+import { BUILD_SLOT_COST, SLOT_PACK_COST, modelKey, useGarageStore } from "@/lib/store";
 
 export const Route = createFileRoute("/garage")({ component: GaragePage });
 
@@ -51,6 +51,9 @@ function GaragePage() {
   const addCogs = useGarageStore((s) => s.addCogs);
   const partCap = useGarageStore((s) => s.partCap);
   const builds = useGarageStore((s) => s.builds ?? {});
+  const builtCount = useGarageStore((s) => s.builtCount());
+  const buildCap = useGarageStore((s) => s.buildCap());
+  const buyBuildSlot = useGarageStore((s) => s.buyBuildSlot);
   const [tab, setTab] = useState<"cars" | "builds" | "parts">("cars");
   const [openKey, setOpenKey] = useState<string | null>(null);
 
@@ -89,7 +92,12 @@ function GaragePage() {
           <p className="font-display text-xs tracking-[0.32em] text-silver">WORKSHOP</p>
           <h1 className="mt-1 font-display text-4xl tracking-wide">My Garage</h1>
         </div>
-        <p className="font-display text-lg text-[#f0d48a]">{cogs} Cogs</p>
+        <div className="text-right">
+          <p className="font-display text-lg text-[#f0d48a]">{cogs} Cogs</p>
+          <p className="text-xs text-silver">
+            {builtCount}/{buildCap} built
+          </p>
+        </div>
       </div>
 
       <button
@@ -98,6 +106,15 @@ function GaragePage() {
         className="mt-3 min-h-10 rounded-md border border-border px-3 text-sm text-silver"
       >
         Test: add 20 Cogs
+      </button>
+
+      <button
+        type="button"
+        disabled={cogs < BUILD_SLOT_COST}
+        onClick={() => buyBuildSlot()}
+        className="mt-2 min-h-12 w-full rounded-md border border-[#f0d48a] font-display text-lg text-[#f0d48a] disabled:opacity-40"
+      >
+        +1 car slot · {BUILD_SLOT_COST} Cogs
       </button>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
@@ -261,8 +278,14 @@ function CarBuild({
   const buySlots = useGarageStore((s) => s.buySlots);
   const deletePart = useGarageStore((s) => s.deletePart);
   const setBuild = useGarageStore((s) => s.setBuild);
+  const clearBuild = useGarageStore((s) => s.clearBuild);
+  const canBuild = useGarageStore((s) => s.canBuild);
+  const buyBuildSlot = useGarageStore((s) => s.buyBuildSlot);
+  const builtCount = useGarageStore((s) => s.builtCount());
+  const buildCap = useGarageStore((s) => s.buildCap());
   const full = car.rows.length >= car.cap;
   const complete = car.unlocked === 6;
+  const open = canBuild(car.make, car.model);
   const choices = designsFor(car.classId);
 
   return (
@@ -297,41 +320,70 @@ function CarBuild({
                 <img src={designSrc(build.design)} alt="" className="h-48 w-full object-cover" />
                 <Vinyl id={build.vinyl} />
               </div>
-            ) : (
+            ) : open ? (
               <p className="mt-2 text-sm text-muted">
                 All 6 slots are filled. Pick a workshop shape. These are not the real car.
               </p>
+            ) : (
+              <p className="mt-2 text-sm text-[#f0d48a]">
+                Garage holds {buildCap} built cars ({builtCount}/{buildCap}). Buy another slot or scrap a build.
+              </p>
             )}
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {choices.map((choice, index) => (
-                <button
-                  key={choice.id}
-                  type="button"
-                  onClick={() => setBuild(car.make, car.model, choice.id, build?.vinyl)}
-                  className={`overflow-hidden rounded-lg border ${
-                    build?.design === choice.id ? "border-[#f0d48a]" : "border-border"
-                  }`}
-                >
-                  <img src={choice.src} alt="" className="h-16 w-full object-cover" />
-                  <span className="block py-1 text-center text-xs text-silver">{index + 1}</span>
-                </button>
-              ))}
-            </div>
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {VINYLS.map((vinyl) => (
-                <button
-                  key={vinyl.id}
-                  type="button"
-                  disabled={!build}
-                  onClick={() => build && setBuild(car.make, car.model, build.design, vinyl.id)}
-                  className={`min-h-10 rounded-md border text-xs ${
-                    build?.vinyl === vinyl.id ? "border-[#f0d48a] text-[#f0d48a]" : "border-border text-silver"
-                  } disabled:opacity-40`}
-                >
-                  {vinyl.label}
-                </button>
-              ))}
-            </div>
+            {open ? (
+              <>
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {choices.map((choice, index) => (
+                    <button
+                      key={choice.id}
+                      type="button"
+                      onClick={() => setBuild(car.make, car.model, choice.id, build?.vinyl)}
+                      className={`overflow-hidden rounded-lg border ${
+                        build?.design === choice.id ? "border-[#f0d48a]" : "border-border"
+                      }`}
+                    >
+                      <img src={choice.src} alt="" className="h-16 w-full object-cover" />
+                      <span className="block py-1 text-center text-xs text-silver">{index + 1}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-3 grid grid-cols-4 gap-2">
+                  {VINYLS.map((vinyl) => (
+                    <button
+                      key={vinyl.id}
+                      type="button"
+                      disabled={!build}
+                      onClick={() => build && setBuild(car.make, car.model, build.design, vinyl.id)}
+                      className={`min-h-10 rounded-md border text-xs ${
+                        build?.vinyl === vinyl.id ? "border-[#f0d48a] text-[#f0d48a]" : "border-border text-silver"
+                      } disabled:opacity-40`}
+                    >
+                      {vinyl.label}
+                    </button>
+                  ))}
+                </div>
+                {build ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const ok = window.confirm("Scrap this build and free the car slot?");
+                      if (ok) clearBuild(car.make, car.model);
+                    }}
+                    className="mt-3 min-h-10 w-full rounded-md border border-border text-sm"
+                  >
+                    Scrap build
+                  </button>
+                ) : null}
+              </>
+            ) : (
+              <button
+                type="button"
+                disabled={cogs < BUILD_SLOT_COST}
+                onClick={() => buyBuildSlot()}
+                className="mt-3 min-h-12 w-full rounded-md border border-[#f0d48a] font-display text-lg text-[#f0d48a] disabled:opacity-40"
+              >
+                +1 car slot · {BUILD_SLOT_COST} Cogs
+              </button>
+            )}
           </>
         ) : (
           <p className="mt-2 text-sm text-muted">Unlock all 6 slots to build this model.</p>

@@ -27,6 +27,8 @@ type AddResult =
 export const BASE_PART_CAP = 10;
 export const SLOT_PACK = 10;
 export const SLOT_PACK_COST = 20;
+export const BASE_BUILD_CAP = 5;
+export const BUILD_SLOT_COST = 50;
 
 export function modelKey(make: string, model: string) {
   return `${make}|||${model}`;
@@ -60,11 +62,22 @@ type GarageState = {
   cogs: number;
   slotBoosts: Record<string, number>;
   builds: Record<string, SavedBuild>;
+  extraBuildSlots: number;
   setGaragePlus: (on: boolean) => void;
-  setBuild: (make: string, model: string, design: string, vinyl?: VinylId) => void;
+  setBuild: (
+    make: string,
+    model: string,
+    design: string,
+    vinyl?: VinylId,
+  ) => { ok: true } | { ok: false; reason: "slots" };
+  clearBuild: (make: string, model: string) => void;
   deletePart: (id: string) => void;
   partCap: (make: string, model: string) => number;
+  buildCap: () => number;
+  builtCount: () => number;
+  canBuild: (make: string, model: string) => boolean;
   buySlots: (make: string, model: string) => { ok: true } | { ok: false; reason: "cogs" };
+  buyBuildSlot: () => { ok: true } | { ok: false; reason: "cogs" };
   addCogs: (amount: number) => void;
 };
 
@@ -83,16 +96,43 @@ export const useGarageStore = create<GarageState>()(
       cogs: 0,
       slotBoosts: {},
       builds: {},
+      extraBuildSlots: 0,
       setGaragePlus: (on) => set({ garagePlus: on }),
+      buildCap: () => BASE_BUILD_CAP + (get().extraBuildSlots ?? 0),
+      builtCount: () => Object.keys(get().builds ?? {}).length,
+      canBuild: (make, model) => {
+        const key = modelKey(make, model);
+        if ((get().builds ?? {})[key]) return true;
+        return Object.keys(get().builds ?? {}).length < get().buildCap();
+      },
       setBuild: (make, model, design, vinyl) => {
         const key = modelKey(make, model);
-        const current = get().builds?.[key];
+        const builds = get().builds ?? {};
+        const current = builds[key];
+        if (!current && Object.keys(builds).length >= get().buildCap()) {
+          return { ok: false, reason: "slots" };
+        }
         set({
           builds: {
-            ...(get().builds ?? {}),
+            ...builds,
             [key]: { design, vinyl: vinyl ?? current?.vinyl ?? "none" },
           },
         });
+        return { ok: true };
+      },
+      clearBuild: (make, model) => {
+        const key = modelKey(make, model);
+        const builds = { ...(get().builds ?? {}) };
+        delete builds[key];
+        set({ builds });
+      },
+      buyBuildSlot: () => {
+        if ((get().cogs ?? 0) < BUILD_SLOT_COST) return { ok: false, reason: "cogs" };
+        set({
+          cogs: (get().cogs ?? 0) - BUILD_SLOT_COST,
+          extraBuildSlots: (get().extraBuildSlots ?? 0) + 1,
+        });
+        return { ok: true };
       },
       demoPurchases: [],
       gpsPreference: "unknown",
@@ -228,6 +268,7 @@ export const useGarageStore = create<GarageState>()(
         cogs: state.cogs ?? 0,
         slotBoosts: state.slotBoosts ?? {},
         builds: state.builds ?? {},
+        extraBuildSlots: state.extraBuildSlots ?? 0,
       }),
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<GarageState>;
@@ -239,6 +280,7 @@ export const useGarageStore = create<GarageState>()(
           cogs: typeof saved.cogs === "number" ? saved.cogs : 0,
           slotBoosts: saved.slotBoosts ?? {},
           builds: saved.builds ?? {},
+          extraBuildSlots: typeof saved.extraBuildSlots === "number" ? saved.extraBuildSlots : 0,
         };
       },
     },
