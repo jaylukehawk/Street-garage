@@ -5,7 +5,9 @@
       "namespace": "android_app",
       "package_name": "com.hawkz.streetgarage",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_PLAY_APP_SIGNING_SHA256"
+        "C1:31:77:5C:93:85:0B:7E:BA:C9:20:BB:42:F1:70:23:A8:AC:30:3F:AA:4C:F4:03:55:1A:D9:36:BF:F5:30:03",
+        "6B:39:28:1D:2D:74:FD:33:61:CD:3C:26:8B:B4:86:54:1E:37:B2:17:89:93:D6:F0:FD:E8:23:63:3C:BC:73:1F",
+        "C7:79:E2:0B:83:E4:EE:04:5C:EF:0C:E3:C3:12:67:01:25:0D:7D:80:FE:07:17:97:66:86:82:2F:A8:DB:8B:83"
       ]
     }
   }
