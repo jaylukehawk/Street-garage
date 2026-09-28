@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { CollectionTabs } from "@/components/collection-tabs";
 import { MakePlate } from "@/components/medal";
 import { useGarageStore } from "@/lib/store";
 import { slugify } from "@/lib/utils";
@@ -19,8 +20,9 @@ function CollectionPage() {
   return (
     <main className="px-5 pt-6">
       <p className="font-display text-xs tracking-[0.32em] text-silver">COLLECTION</p>
-      <h1 className="mt-1 font-display text-4xl tracking-wide">Makes</h1>
+      <h1 className="mt-1 font-display text-4xl tracking-wide">Collection</h1>
       <p className="mt-1 text-sm text-muted">{makes.length} makes in the garage</p>
+      <CollectionTabs />
       <ul className="mt-5 space-y-3">
         {makes.map((row) => (
           <li key={row.make}>

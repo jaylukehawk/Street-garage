@@ -36,7 +36,7 @@ function TrophiesPage() {
   const classes = useMemo(() => specialCounts(sightings), [sightings]);
   return (
     <main className="px-5 pt-6 pb-4">
-      <p className="font-display text-xs tracking-[0.32em] text-silver">SERVICE</p>
+      <p className="font-display text-xs tracking-[0.32em] text-silver">RANKS</p>
       <h1 className="mt-1 font-display text-4xl tracking-wide">Trophies</h1>
 
       <section className="mt-6">
